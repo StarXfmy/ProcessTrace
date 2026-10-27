@@ -1,0 +1,3033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>过程留痕 · AIGC 使用记录</title>
+<meta name="description" content="平时随手记下每一次 AI 使用，写材料时整理成能逐条查回原文的 AI 使用声明。">
+<meta name="theme-color" content="#ffffff">
+<style>
+:root{
+  /* 一个强调色 + 两个状态色 + 中性灰阶，颜色只用在“需要你注意”的地方 */
+  --bg:#ffffff; --card:#fafafa; --paper:#ffffff;
+  --line:#e4e4e4; --line2:#cfcfcf;
+  --ink:#1a1a1a; --ink2:#4d4d4d; --ink3:#8c8c8c;
+  --brand:#111111; --brandbg:#f0f0f0;
+  --ok:#1f7a4d; --okbg:#e8f3ec;
+  --bad:#a33a2a; --badbg:#f7e9e6;
+  --warn:#8a6a1f; --warnbg:#f5f0e2;
+  --mute:#7c7c7c; --mutebg:#f0f0f0;
+  --r:5px; --sh:none;
+  /* 间距只用 4 的倍数 */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  /* 字号：22 / 18 / 16 / 15 / 13，正文 16 */
+  --f1:22px; --f2:18px; --f3:16px; --f4:15px; --f5:13px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font:var(--f3)/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:190px;
+}
+
+/* ---------- 顶栏 ---------- */
+.top{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  padding:var(--s4) var(--s4) 0;
+}
+.brand{font-size:var(--f1);font-weight:700;letter-spacing:.5px;color:var(--ink)}
+.topnote{font-size:var(--f5);color:var(--ink3);padding:var(--s1) 0 var(--s2)}
+.tabs{display:flex;gap:var(--s5);overflow-x:auto;margin-top:var(--s3)}
+.tab{
+  flex:0 0 auto;border:0;background:transparent;cursor:pointer;
+  font:inherit;font-size:var(--f4);color:var(--ink3);
+  padding:var(--s2) 0 var(--s3);
+  border-bottom:2px solid transparent;
+}
+.tab:hover{color:var(--ink2)}
+.tab.on{color:var(--ink);border-bottom-color:var(--brand);font-weight:600}
+.tab i{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:21px;height:21px;border-radius:50%;margin-right:7px;
+  font-style:normal;font-size:12px;font-weight:700;
+  background:var(--line);color:var(--ink2);vertical-align:1px;
+}
+.tab.on i{background:var(--brand);color:#fff}
+
+/* ---------- 主体 ---------- */
+#page{max-width:1120px;margin:0 auto;padding:var(--s5) var(--s4) 0}
+.lead,.form{max-width:760px;margin-left:auto;margin-right:auto}
+.view{display:none;animation:fade .2s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.lead{font-size:var(--f4);color:var(--ink2);margin:0 0 var(--s5);line-height:1.85}
+.lead b{color:var(--ink);font-weight:600}
+.card{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:var(--s5) var(--s5) var(--s4);margin-bottom:var(--s3);
+}
+
+/* ---------- 表单 ---------- */
+.field{display:block;margin-bottom:var(--s5)}
+.field>span{display:block;font-size:var(--f4);font-weight:600;color:var(--ink);margin-bottom:var(--s2);letter-spacing:.2px}
+.row.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+input,select,textarea{
+  width:100%;font:inherit;font-size:var(--f3);color:var(--ink);
+  background:#fff;border:1px solid var(--line2);border-radius:4px;
+  padding:10px var(--s3);
+}
+input[readonly]{background:var(--bg);color:var(--ink3);border-color:var(--line)}
+textarea{resize:vertical;line-height:1.7}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,0,0,.1)}
+.field.mine{background:#fafafa;border:1px solid var(--line);border-radius:4px;padding:var(--s3) var(--s3) var(--s1)}
+.onlyme{
+  font-style:normal;font-size:12px;font-weight:600;color:var(--warn);
+  background:var(--warnbg);border-radius:3px;padding:2px var(--s2);margin-left:var(--s2);vertical-align:1px;
+}
+.actions{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
+.hint{font-size:var(--f5);color:var(--ink3)}
+.hint.bad{color:var(--bad)}
+.btn{
+  font:inherit;font-size:var(--f4);cursor:pointer;
+  background:var(--paper);color:var(--ink2);
+  border:1px solid var(--line2);border-radius:4px;padding:9px var(--s4);
+}
+.btn:hover{background:var(--bg)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn[disabled]:hover{background:var(--paper)}
+.btn.primary[disabled]:hover{background:var(--brand)}
+.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+.btn.primary:hover{background:#333333}
+
+/* ---------- 计量条（兼筛选器） ---------- */
+.meter{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s5)}
+.meter span{
+  font-size:var(--f5);padding:var(--s1) var(--s3);border-radius:4px;
+  background:var(--paper);border:1px solid var(--line);color:var(--ink2);
+  cursor:pointer;user-select:none;transition:border-color .15s,box-shadow .15s;
+}
+.meter span:hover{border-color:var(--brand)}
+.meter span.on{border-color:var(--brand);box-shadow:0 0 0 2px rgba(0,0,0,.14);font-weight:600}
+.meter b{font-weight:700}
+.meter .n-warn{color:var(--warn)}
+.meter .n-bad{color:var(--warn)}
+.meter .n-ok{color:var(--ok)}
+
+/* ---------- 记录卡 ---------- */
+.rc{position:relative;padding-left:var(--s3)}
+.rc::before{
+  content:"";position:absolute;left:0;top:var(--s4);bottom:var(--s4);width:3px;
+  border-radius:2px;background:var(--line2);
+}
+.rc.v-agree::before{background:var(--ok)}
+.rc.v-disagree::before{background:var(--bad)}
+.rc.v-disagree{opacity:.6}
+.rchead{display:flex;align-items:baseline;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s2)}
+.rchead time{font:var(--f5)/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink3)}
+.rchead .tool{font-size:var(--f5);font-weight:600;color:var(--brand)}
+.rchead .scene{font-size:var(--f2);font-weight:600;color:var(--ink)}
+.q{
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--line2);border-radius:0;
+  padding:var(--s2) var(--s3);margin:var(--s2) 0;font-size:var(--f3);
+  white-space:pre-wrap;word-break:break-word;
+}
+.q>em{display:block;font-style:normal;font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:var(--s1);letter-spacing:.3px}
+.q.mine{border-color:var(--line);border-left-color:var(--brandbg);background:#fafafa}
+.q.miss{border-color:var(--line);border-left:3px solid var(--warn);background:#fafafa}
+.q.miss>em{color:var(--warn)}
+.slot{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;margin:var(--s3) 0}
+.slot>span{font-size:var(--f5);color:var(--ink3)}
+.slot select{width:auto;min-width:128px;font-size:var(--f4);padding:var(--s1) var(--s2)}
+.verdict{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center;margin-top:var(--s3)}
+.vbtn{
+  font:inherit;font-size:var(--f4);cursor:pointer;
+  background:var(--paper);border:1px solid var(--line2);border-radius:4px;
+  padding:var(--s1) var(--s3);color:var(--ink2);
+}
+.vbtn:hover{background:var(--bg)}
+.vbtn.on-agree{background:var(--ok);border-color:var(--ok);color:#fff}
+.vbtn.on-disagree{background:var(--bad);border-color:var(--bad);color:#fff}
+.vtag{font-size:var(--f5);color:var(--ink3);margin-left:auto}
+.verdictnote{font-size:var(--f5);color:var(--ink3);margin:var(--s1) 0 0}
+.empty{
+  text-align:center;color:var(--ink3);font-size:var(--f4);
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:var(--s6) var(--s4);
+}
+
+/* ---------- 导出：纸感 ---------- */
+.paper{
+  background:var(--paper);border:1px solid var(--line2);border-radius:3px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  padding:var(--s5) var(--s5);margin-bottom:var(--s4);
+}
+.paper h2{font-size:var(--f1);margin:0 0 var(--s1);letter-spacing:.3px;font-family:Georgia,"Songti SC","Noto Serif CJK SC",serif}
+.paper .sub{font-size:var(--f5);color:var(--ink3);margin:0 0 var(--s5)}
+.paper h3{
+  font-size:var(--f4);margin:var(--s5) 0 var(--s2);color:var(--brand);
+  border-left:3px solid var(--brand);padding-left:var(--s2);font-weight:700;
+}
+.paper h3:first-of-type{margin-top:0}
+.paper h3 .cnt{font-size:var(--f5);font-weight:400;color:var(--ink3);margin-left:var(--s2)}
+.item{margin:0 0 var(--s3);font-size:var(--f3)}
+.item .ref{
+  font:var(--f5)/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:var(--ink3);background:var(--bg);border-radius:4px;padding:1px var(--s1);margin-left:var(--s1);
+}
+.quote{
+  display:block;border-left:2px solid var(--line2);padding:var(--s1) 0 var(--s1) var(--s3);
+  margin-top:var(--s1);color:var(--ink2);white-space:pre-wrap;word-break:break-word;
+}
+.gapline{
+  background:var(--badbg);border:1px solid #d9b3aa;border-radius:8px;
+  padding:var(--s2) var(--s3);font-size:var(--f4);color:var(--bad);margin:0 0 var(--s3);
+}
+.stats{
+  margin-top:var(--s5);padding-top:var(--s4);border-top:1px dashed var(--line2);
+  font-size:var(--f4);color:var(--ink2);
+}
+.stats b{color:var(--brand)}
+.sign{margin-bottom:var(--s5)}
+
+.toast{
+  position:fixed;left:50%;bottom:var(--s5);transform:translateX(-50%);
+  background:var(--ink);color:#fafafa;font-size:var(--f4);
+  border-radius:5px;padding:var(--s2) var(--s5);box-shadow:0 6px 20px rgba(0,0,0,.16);z-index:95;
+}
+
+@media (max-width:560px){
+  body{font-size:var(--f3)}
+  .row.two{grid-template-columns:1fr}
+  .paper{padding:var(--s4)}
+  .top{padding:var(--s2) var(--s3) 0}
+  #page{padding:var(--s3) var(--s3) 0}
+}
+
+/* ---------- 快速录入 ---------- */
+.btn.tiny{font-size:var(--f5);padding:var(--s1) var(--s3);border-radius:6px}
+.quick{background:#fafafa;border:1px solid var(--line);border-radius:4px;padding:var(--s3);margin:var(--s1) 0 var(--s4)}
+.quickhead{display:flex;align-items:center;gap:var(--s3);justify-content:space-between;margin-bottom:var(--s2)}
+.quickhead b{font-size:var(--f4);color:var(--brand)}
+.quick textarea{font-size:var(--f4)}
+.quickrow{display:grid;grid-template-columns:auto 1fr;gap:var(--s2);align-items:center;margin:var(--s2) 0 var(--s1)}
+.quickrow input[type=text]{font-size:var(--f4)}
+.uploader{cursor:pointer;display:inline-block}
+.uploader .btn{display:inline-block}
+.imgprev{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s2)}
+.imgthumb{position:relative;width:72px;height:72px;border-radius:4px;overflow:hidden;border:1px solid var(--line2)}
+.imgthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.imgthumb button{
+  position:absolute;top:2px;right:2px;width:20px;height:20px;border:0;border-radius:50%;
+  background:rgba(26,26,26,.7);color:#fff;font-size:var(--f5);line-height:1;cursor:pointer;padding:0;
+}
+
+/* ---------- 卡片里的截图与链接 ---------- */
+.thumbrow{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s2) 0}
+.thumbrow img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line2)}
+.thumblink{font-size:var(--f5);color:var(--mute);word-break:break-all;margin-top:var(--s1)}
+
+/* ---------- 定位高亮 + 复制拦截 ---------- */
+.rc.flash{animation:flashcard 2.4s ease}
+@keyframes flashcard{
+  0%,100%{box-shadow:var(--sh)}
+  15%,55%{box-shadow:0 0 0 3px rgba(0,0,0,.4)}
+}
+.btn.blocked{border-color:var(--warn);background:var(--warnbg);color:var(--warn);font-weight:600}
+.btn.blocked:hover{background:#e8e8e8}
+
+/* ---------- 核查提示 / 锁定 / 排除原因 ---------- */
+.slotcheck{font-size:var(--f5);color:var(--warn);margin:var(--s3) 0 var(--s1)}
+.locknote{font-size:var(--f5);color:var(--ink3);margin:var(--s2) 0 0}
+.dropbox{margin-top:var(--s3);background:var(--badbg);border:1px solid #d9b3aa;border-radius:4px;padding:var(--s3)}
+.dropbox em{display:block;font-style:normal;font-size:var(--f5);font-weight:700;color:var(--bad);margin-bottom:var(--s2)}
+.dropbox input{font-size:var(--f4);background:var(--paper);border-color:#d9b3aa}
+.dropbox.shown{background:var(--mutebg);border-color:var(--line2)}
+.dropbox.shown em{color:var(--ink3)}
+.presets{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s2)}
+.presets .vbtn{font-size:var(--f5);padding:var(--s1) var(--s3)}
+
+/* ---------- 全文折叠 / 导出选项 ---------- */
+details.fulltext{margin:var(--s1) 0 var(--s3)}
+details.fulltext summary{font-size:var(--f5);color:var(--ink3);cursor:pointer;padding:var(--s2) 0;user-select:none}
+details.fulltext summary:hover{color:var(--ink2)}
+details.fulltext[open]{background:var(--bg);border-radius:8px;padding:var(--s1) var(--s3) var(--s3)}
+.opt{display:flex;align-items:flex-start;gap:var(--s2);font-size:var(--f4);color:var(--ink2);margin:0 0 var(--s4);cursor:pointer;line-height:1.6}
+.opt input{margin-top:var(--s1);width:auto;flex:0 0 auto}
+
+/* ---------- 使用方式 ---------- */
+.usebox{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;margin:var(--s2) 0 var(--s1);font-size:var(--f5);color:var(--ink3)}
+.usebox .vbtn{font-size:var(--f5);padding:var(--s1) var(--s3)}
+.vbtn.on-use{background:var(--brandbg);border-color:var(--brand);color:var(--brand);font-weight:600}
+.vbtn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ---------- 反馈动效 ---------- */
+.vbtn,.btn,.tab{transition:background .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease}
+.vbtn:active{transform:scale(.97)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.rc.justlocked{animation:lockflash .9s ease}
+@keyframes lockflash{
+  0%,100%{box-shadow:var(--sh)}
+  30%{box-shadow:0 0 0 3px rgba(31,122,77,.25)}
+}
+
+/* ---------- 打开感（仅每个会话首次，0.4s 内结束） ---------- */
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+body.entering .top{animation:slideDown .25s ease both}
+body.entering .view.on{animation:fadeUp .3s ease both}
+.rc.enter{animation:fadeUp .35s ease both}
+
+/* ---------- 多人记录合并（队里几人就几台设备） ---------- */
+.field>span small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:var(--s2);letter-spacing:0}
+.merge{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:var(--s4);margin:0 0 var(--s4);
+}
+.merge>b{display:block;font-size:var(--f4);margin-bottom:var(--s1)}
+.merge>span{display:block;font-size:var(--f5);color:var(--ink2);line-height:1.7;margin-bottom:var(--s3)}
+.importbox{
+  background:#f5f5f5;border:1px solid var(--brand);border-radius:4px;
+  padding:var(--s3) var(--s4);margin:0 0 var(--s4);
+}
+.importbox em{display:block;font-style:normal;font-weight:700;font-size:var(--f4);color:var(--brand);margin-bottom:var(--s2)}
+.importbox ul{margin:0 0 var(--s2);padding-left:20px}
+.importbox li{font-size:var(--f5);color:var(--ink2);line-height:1.75}
+.importbox .impsure{
+  font-size:var(--f5);color:var(--ink2);background:var(--paper);
+  border-left:3px solid var(--brand);padding:var(--s1) var(--s3);margin:0 0 var(--s3);line-height:1.75;
+}
+.importbox.bad{background:var(--badbg);border-color:var(--bad)}
+.importbox.bad em{color:var(--bad)}
+.tool.own,.ref.own{background:var(--brandbg);color:#6d4a1c;font-weight:600}
+.ref.demo{background:var(--warnbg);color:var(--warn);font-weight:600}
+.signrow{display:flex;align-items:center;gap:var(--s3)}
+.signrow b{font-size:var(--f3)}
+
+/* ---------- 按轮拆分的预览卡片 ---------- */
+.turns{margin-top:var(--s4)}
+.turn{border:1px solid var(--line2);border-radius:5px;padding:var(--s3);margin-bottom:var(--s3);background:var(--paper)}
+.turnhead{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;margin-bottom:var(--s2)}
+.turnhead b{font-size:var(--f3)}
+.turnops{margin-left:auto;display:flex;gap:6px}
+.turnrow{font-size:var(--f4);color:var(--ink2);line-height:1.75;margin-bottom:var(--s1)}
+.ttag{display:inline-block;font-size:var(--f5);color:var(--brand);margin-right:6px;font-weight:600}
+.turn .field.mine{margin:var(--s2) 0 0;padding:var(--s2) var(--s3) var(--s1)}
+.turnfield{display:block;margin:var(--s2) 0}
+.turnfield>span{display:block;font-size:var(--f5);font-weight:600;color:var(--ink2);margin-bottom:var(--s1)}
+.turnfield textarea{font-size:var(--f3)}
+.pool{margin-top:var(--s2)}
+.pool summary{font-size:var(--f4);font-weight:600;color:var(--ink2);cursor:pointer;user-select:none;padding:var(--s1) 0}
+.pool summary:hover{color:var(--brand)}
+.poolrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:var(--s2);font-size:var(--f4);color:var(--ink2)}
+.poolrow b{font-weight:600;flex:0 0 auto}
+.poolrow .vbtn{font-size:var(--f4);padding:3px 10px}
+.poolrow .vbtn.sent.on-use{background:var(--brandbg);border-color:var(--brand);color:var(--brand)}
+
+/* ---------- 句式引导 ---------- */
+.guidechips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:var(--s2) 0 var(--s3)}
+.guidechips .gcap{font-size:11px;color:var(--ink3);margin-right:var(--s1)}
+.guidechips button{
+  font:inherit;font-size:12px;line-height:1.7;cursor:pointer;
+  color:var(--ink2);background:var(--paper);
+  border:1px solid var(--line2);border-radius:4px;padding:2px 10px;
+}
+.guidechips button:hover{border-color:var(--brand);color:var(--brand);background:var(--brandbg)}
+.field.mine .guidechips{margin-bottom:var(--s2)}
+.quickbtns{display:flex;gap:var(--s2);align-items:center;flex:0 0 auto}
+.btn.wide{flex:1 1 100%;width:100%;justify-content:center;text-align:center;padding:var(--s3) var(--s4);font-size:var(--f3)}
+
+#formHint{font-size:13px}
+.tsline{margin:var(--s4) 0 0;font-size:13px;color:var(--ink3)}
+.tsline b{font-weight:500;color:var(--ink2)}
+/* ---------- 一次写一条 / 可选拆开 ---------- */
+#recForm .field{margin-bottom:var(--s4)}
+/* 保存条贴着视口底部，表单再长也随时能点 */
+.savebar{
+  position:sticky;bottom:0;z-index:5;
+  display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;
+  background:var(--paper);
+  border-top:1px solid var(--line);
+  box-shadow:0 -6px 16px rgba(0,0,0,.03);
+  margin:var(--s4) calc(-1 * var(--s5)) calc(-1 * var(--s4));
+  padding:var(--s3) var(--s5);
+}
+.extra{margin:var(--s4) 0 0;border-top:1px solid var(--line);padding-top:var(--s1)}
+.extra summary{font-size:13px;color:var(--ink3);cursor:pointer;padding:var(--s2) 0;user-select:none;list-style:none;outline:none}
+.extra summary::-webkit-details-marker{display:none}
+.extra summary::before{content:"＋ ";color:var(--brand);font-weight:700}
+.extra[open] summary::before{content:"− "}
+.extra summary:hover{color:var(--brand)}
+.extra .quickrow{margin-top:var(--s1)}
+.splitrow{margin:var(--s3) 0 0}
+.linkbtn{
+  border:0;background:none;padding:0 0 2px;cursor:pointer;
+  font:inherit;font-size:13px;color:var(--ink3);
+  border-bottom:1px dashed var(--line2);
+}
+.linkbtn:hover{color:var(--brand);border-bottom-color:var(--brand)}
+.addturn{margin:var(--s2) 0 var(--s3)}
+.addturn .btn{width:100%;border-style:solid}
+
+/* ---------- 删除与回收站 ---------- */
+.rowdel{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s2);padding-top:var(--s2);border-top:1px dashed var(--line)}
+.vbtn.on-disagree{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.trashbar{margin:0 0 var(--s3)}
+.trashpanel{background:var(--paper);border:1px solid var(--line2);border-radius:4px;padding:var(--s3);margin:0 0 var(--s4)}
+.trashitem{display:flex;gap:var(--s2);align-items:center;justify-content:space-between;flex-wrap:wrap;padding:var(--s2) 0;border-bottom:1px dashed var(--line)}
+.trashitem:last-child{border-bottom:0}
+.trashmain{display:flex;flex-direction:column;gap:2px;font-size:var(--f4)}
+.trashmain .hint{font-size:12px}
+.trashops{display:flex;gap:6px}
+
+/* 帮助入口 */
+/* 右下角气泡按钮：帮助与反馈各自独立 */
+.bubbles{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:60}
+.bubble{
+  display:flex;align-items:center;gap:6px;
+  padding:11px 18px;border-radius:999px;
+  background:var(--brand);color:#fff;font-size:15px;font-weight:600;
+  text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.28);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.bubble:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.34);color:#fff}
+.bubble.fb{background:var(--ok)}
+@media (max-width:560px){
+  .bubbles{right:12px;bottom:14px;gap:8px}
+  .bubble{padding:10px 14px;font-size:14px}
+}
+
+/* ---------- 新手引导：屏幕正中的教程卡 ---------- */
+.bubble.guide{border:0;font-family:inherit;cursor:pointer;background:var(--brand)}
+.bubble.guide:hover{background:#333333}
+.coach{
+  position:fixed;inset:0;z-index:90;
+  background:rgba(0,0,0,.58);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+}
+.coachcard{
+  position:relative;
+  width:min(660px,100%);
+  max-height:calc(100vh - 32px);
+  overflow:auto;
+  background:var(--paper);
+  border:1px solid var(--line2);
+  border-radius:10px;
+  padding:20px 26px 18px;
+  box-shadow:0 24px 60px rgba(0,0,0,.3);
+  animation:coachIn .22s ease both;
+}
+.coachmute{
+  position:absolute;top:8px;right:10px;z-index:4;
+  border:0;background:transparent;color:var(--ink3);cursor:pointer;
+  padding:5px;line-height:0;border-radius:4px;opacity:.65;
+}
+.coachmute:hover{opacity:1;background:rgba(0,0,0,.04)}
+.coachmute .slash{display:none}
+.coachmute.off .slash{display:block}
+.coachmute.off{opacity:.45}
+@keyframes coachIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+.coachstep{font-size:12px;color:var(--brand);font-weight:700;letter-spacing:.6px;margin-bottom:4px}
+.coachcard h3{font-size:21px;margin:0 0 6px;line-height:1.4;font-weight:700;color:var(--ink)}
+.coachcard p{margin:0 0 16px;font-size:15px;color:var(--ink2);line-height:1.8}
+.coachcard p b{color:var(--ink)}
+.coachops{display:flex;align-items:center;gap:8px}
+#coachSkip{margin-right:auto}
+.coachops .btn{font-size:14px;padding:8px 16px}
+
+/* 图区：每步一段小动画 */
+.coachfig{
+  height:clamp(150px,24vh,200px);
+  background:#f5f5f5;border:1px solid var(--line);border-radius:6px;
+  margin:0 0 16px;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.figrow{display:flex;align-items:center;justify-content:center;width:100%}
+.figcol{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;padding:0 20px}
+@keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes figScale{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+@keyframes figDrop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes figType{from{width:0}to{width:var(--w)}}
+@keyframes figCaret{50%{opacity:0}}
+@keyframes figPulse{50%{transform:translateX(5px)}}
+
+/* 1 账本 → 附录 */
+.f-stack{position:relative;width:64px;height:82px;margin-right:4px}
+.f-stack i{position:absolute;inset:0;background:#fff;border:1px solid var(--line2);border-radius:4px}
+.f-stack i:nth-child(1){transform:rotate(-13deg) translate(-18px,8px);background:#e0e0e0;animation:figIn .4s both}
+.f-stack i:nth-child(2){transform:rotate(-7deg) translate(-9px,4px);background:#f5f5f5;animation:figIn .4s .08s both}
+.f-stack i:nth-child(3){animation:figIn .4s .16s both}
+.f-stack i:nth-child(3)::before,
+.f-stack i:nth-child(3)::after{
+  content:"";position:absolute;left:11px;right:11px;height:3px;border-radius:2px;background:var(--line);
+}
+.f-stack i:nth-child(3)::before{top:15px;background:var(--brandbg)}
+.f-stack i:nth-child(3)::after{top:25px;right:26px}
+.f-arrow{font-size:26px;color:var(--brand);margin:0 22px;animation:figPulse 1.4s ease-in-out infinite}
+.f-doc{width:74px;height:94px;background:#fff;border:1px solid var(--line2);border-radius:3px;padding:12px 9px;display:flex;flex-direction:column;gap:6px}
+.f-doc b{display:block;height:4px;border-radius:2px;background:var(--line)}
+.f-doc b:nth-child(1){width:55%;background:var(--brandbg)}
+.f-doc b:nth-child(4){width:70%}
+
+/* 2 填名字 */
+.f-field{width:min(300px,86%)}
+.f-cap{display:block;font-size:12px;color:var(--ink2);font-weight:600;margin-bottom:5px}
+.f-in{
+  background:#fff;border:1px solid var(--brand);border-radius:4px;
+  height:38px;padding:0 10px;display:flex;align-items:center;
+  box-shadow:0 0 0 3px rgba(0,0,0,.12);
+}
+.f-type{display:inline-block;overflow:hidden;white-space:nowrap;font-size:15px;color:var(--ink);width:var(--w);animation:figType .7s steps(2,end) .25s both}
+.f-type.s8{animation-timing-function:steps(8,end);animation-duration:.8s;animation-delay:.3s}
+.f-caret{width:1.5px;height:18px;background:var(--brand);margin-left:1px;animation:figCaret .9s step-end infinite}
+
+/* 3 贴对话 */
+.f-row{display:flex;align-items:center;gap:8px;width:100%;justify-content:center}
+.f-tag{flex:0 0 30px;text-align:right;font-size:11px;color:var(--ink3)}
+.f-in.tall{height:42px;width:min(430px,78%);justify-content:flex-start;border-color:var(--line2);box-shadow:none}
+.f-drop{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:figDrop .5s ease var(--d) both}
+
+/* 4 分成几条（旧的拆分示意图，已不在引导里用） */
+
+/* 5 写后来 */
+.f-minicard{
+  width:min(360px,90%);font-size:12px;color:var(--ink3);background:#fff;
+  border:1px solid var(--line);border-radius:4px;padding:7px 10px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.f-in.later{height:34px;width:min(360px,90%);box-shadow:none;padding:0 10px}
+.f-field .f-in.later{width:100%}
+.f-badge{font-size:11px;color:var(--warn);background:var(--warnbg);border-radius:3px;padding:2px 8px}
+
+/* 6 核对 */
+.f-ok{
+  font-size:13px;font-weight:600;color:#fff;background:var(--brand);
+  border-radius:4px;padding:7px 20px;animation:figOk 2.9s ease infinite;
+}
+@keyframes figOk{
+  0%,44%{background:var(--brand);transform:scale(1)}
+  52%{transform:scale(.93)}
+  64%,100%{background:var(--ok);transform:scale(1)}
+}
+
+/* 7 导出 */
+.f-doc.big{width:72px;height:74px;animation:figIn .5s both}
+.f-file{
+  font-size:12px;color:var(--ink2);background:#fff;border:1px solid var(--line2);
+  border-radius:3px;padding:4px 12px;animation:fFileIn 2.9s ease infinite;
+}
+@keyframes fFileIn{
+  0%{opacity:.35;transform:translateY(3px)}
+  55%,100%{opacity:1;transform:none}
+}
+
+/* 鼠标指针 + 点击波纹：只给“要动手点一下”的步骤用 */
+.f-anchor{position:relative;display:inline-block}
+.f-field .f-anchor{display:block}
+.f-anchor .f-in{width:100%}
+.f-cursor{
+  position:absolute;left:calc(100% - 9px);top:calc(100% - 13px);
+  width:20px;height:24px;z-index:3;pointer-events:none;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));
+  animation:fCursor 2.9s ease-in-out infinite;
+}
+.f-cursor path{fill:#1a1a1a;stroke:#fff;stroke-width:1.4}
+@keyframes fCursor{
+  0%{transform:translate(42px,28px);opacity:.15}
+  12%{opacity:1}
+  40%,100%{transform:translate(0,0);opacity:1}
+  48%{transform:translate(0,0) scale(.84)}
+  56%{transform:translate(0,0) scale(1)}
+}
+.f-click{
+  position:absolute;left:calc(100% - 5px);top:calc(100% - 9px);
+  width:6px;height:6px;border-radius:50%;border:2px solid var(--brand);
+  opacity:0;z-index:2;transform:translate(-50%,-50%);
+  animation:fClick 2.9s ease-out infinite;
+}
+@keyframes fClick{
+  0%,40%{width:6px;height:6px;opacity:0}
+  47%{width:8px;height:8px;opacity:.85}
+  72%{width:30px;height:30px;opacity:0}
+  100%{opacity:0}
+}
+.f-btn{
+  font-size:13px;font-weight:600;color:#fff;background:var(--brand);
+  border-radius:4px;padding:8px 18px;white-space:nowrap;
+  animation:fBtnPress 2.9s ease-in-out infinite;
+}
+@keyframes fBtnPress{
+  0%,40%{transform:scale(1)}
+  48%{transform:scale(.95)}
+  56%{transform:scale(1)}
+}
+
+@media (max-width:560px){
+  .coach{padding:10px}
+  .coachcard{padding:14px 16px 14px}
+  .coachcard h3{font-size:18px}
+  .coachcard p{font-size:14px}
+}
+
+/* ---------- v26：类型三选一、多图、已保存列表 ---------- */
+.types{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;margin:0 0 var(--s5)}
+.typeslabel{font-size:var(--f4);font-weight:600;color:var(--ink)}
+.type{
+  font:inherit;font-size:var(--f4);cursor:pointer;border-radius:var(--r);
+  padding:6px 20px;background:var(--card);color:var(--ink2);border:1px solid var(--line2);
+}
+.type:hover{border-color:var(--ink3)}
+.type.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.imglist{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s2)}
+.imgitem{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.imgitem .imgthumb{width:64px;height:64px;margin:0}
+.imgitem .imgnote{
+  flex:1;min-width:160px;font:inherit;font-size:var(--f4);color:var(--ink);
+  border:1px solid var(--line2);border-radius:var(--r);padding:6px 10px;background:var(--paper);
+}
+.imgitem .imgnote:focus{outline:none;border-color:var(--ink3)}
+.imgthumb i{
+  position:absolute;left:0;right:0;bottom:0;font-style:normal;font-size:10px;line-height:1.3;
+  color:#fff;background:rgba(0,0,0,.55);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.reviewbox{border-top:1px solid var(--line);margin-top:var(--s6);padding-top:var(--s5)}
+.reviewhead{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s3)}
+.reviewhead h2{font-size:var(--f2);margin:0}
+.tool.type-ref{background:#eef2f7;color:#3c4a5a}
+.tool.type-orig{background:#eef4ee;color:#3a5240}
+.tool.type-ai{background:var(--mutebg);color:var(--mute)}
+
+/* ---------- v27：左列表 + 右详情、折叠卡片 ---------- */
+.bubbles{left:16px;right:auto;align-items:flex-start}
+.savelist{display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);gap:var(--s5);align-items:start}
+.cardlist{display:flex;flex-direction:column;gap:var(--s2);min-width:0}
+.rcb{
+  border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;
+  background:var(--paper);cursor:pointer;transition:border-color .12s ease,box-shadow .12s ease;
+}
+.rcb:hover{border-color:var(--line2)}
+.rcb.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.rcb .rchead{align-items:center;margin-bottom:4px}
+.rcb .rctitle{font-size:var(--f4);font-weight:600;line-height:1.55;color:var(--ink);word-break:break-word}
+.rcb .slotmini{
+  font:inherit;font-size:12px;color:var(--ink2);background:var(--paper);
+  border:1px solid var(--line2);border-radius:3px;padding:1px 4px;max-width:140px;
+}
+.rcb .slotmini:focus{outline:none;border-color:var(--ink3)}
+.carddetail{
+  position:sticky;top:118px;min-width:0;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--paper);
+  padding:var(--s4) var(--s4) var(--s3);min-height:140px;
+}
+.detailhead{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3);flex-wrap:wrap}
+.detailhead .vtag{margin-left:0}
+.detailhead .vbtn{margin-left:auto}
+.detail-empty{color:var(--ink3);font-size:var(--f4);padding:36px 0;text-align:center}
+.imgthumb.big{width:96px;height:96px}
+@media (max-width:900px){
+  .savelist{grid-template-columns:1fr}
+  .carddetail{position:static}
+}
+
+/* ---------- v28：表单与已保存区左右并排 ---------- */
+#page{max-width:1500px}
+.recordgrid{display:grid;grid-template-columns:minmax(380px,440px) minmax(0,1fr);gap:var(--s6);align-items:start}
+.colform{min-width:0}
+.colform .lead{margin:0 0 var(--s3);max-width:none}
+.colform .form{margin:0;max-width:none}
+.colreview{min-width:0}
+.reviewbox{border-top:0;margin-top:0;padding-top:0}
+.savelist{grid-template-columns:minmax(240px,300px) minmax(0,1fr)}
+.carddetail{top:96px}
+@media (max-width:1150px){
+  .recordgrid{grid-template-columns:1fr}
+  .colreview{margin-top:var(--s5)}
+  .savelist{grid-template-columns:1fr}
+}
+
+/* v28 微调：左列底部留白避开左下气泡；列表列略宽；保存条阴影去掉 */
+.colform{padding-bottom:150px}
+.savelist{grid-template-columns:minmax(260px,340px) minmax(0,1fr)}
+.savebar{border-top:1px solid var(--line);box-shadow:none}
+
+/* v28：列表列放宽让卡片头部一行放得下；气泡略缩小减少遮挡 */
+.savelist{grid-template-columns:minmax(300px,380px) minmax(0,1fr)}
+.rcb .rchead{font-size:11px;gap:6px}
+.rcb .slotmini{max-width:128px;font-size:11px;padding:1px 2px}
+.bubble{font-size:13px;padding:8px 14px;gap:4px}
+.bubbles{gap:8px;bottom:14px;left:12px}
+
+/* 保存条不再贴视口底，避免和左下气泡重叠 */
+.savebar{position:static;margin:var(--s4) calc(-1 * var(--s5)) calc(-1 * var(--s4));box-shadow:none}
+
+/* v29：详情点开时滑入、再点收起 */
+.carddetail{transition:opacity .15s ease,transform .15s ease}
+.carddetail.in{animation:detailIn .22s cubic-bezier(.2,.7,.3,1)}
+.carddetail.out{opacity:0;transform:translateX(10px)}
+@keyframes detailIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+@media (max-width:1150px){
+  @keyframes detailIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .carddetail.out{transform:translateY(-6px)}
+}
+
+/* v30：三个入口固定到顶栏右侧 */
+.toprow{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap}
+.toprow .tabs{margin-top:0}
+.toplinks{margin-left:auto;display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.toplinks .bubble{
+  background:var(--card);color:var(--ink2);border:1px solid var(--line2);
+  box-shadow:none;font-size:13px;font-weight:500;padding:7px 12px;
+}
+.toplinks .bubble:hover{background:var(--brand);color:#fff;border-color:var(--brand);transform:none;box-shadow:none}
+.toplinks .bubble.fb{background:var(--card);color:var(--ink2);border-color:var(--line2)}
+.toplinks .bubble.fb:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+@media (max-width:720px){
+  .toplinks{margin-left:0;width:100%}
+}
+
+/* v31：默认列表占满，点开详情从右侧挤出位置，再点恢复 */
+.savelist{display:flex;gap:var(--s5);align-items:flex-start}
+.cardlist{flex:1 1 auto;min-width:0}
+.carddetail{
+  flex:0 0 0;width:0;min-width:0;opacity:0;overflow:hidden;
+  position:sticky;top:96px;
+  border:0;padding:0;background:transparent;min-height:0;
+  transition:flex-basis .3s cubic-bezier(.2,.7,.3,1),opacity .18s ease;
+}
+.savelist.open .carddetail{flex-basis:56%;opacity:1}
+.detailinner{
+  min-width:440px;
+  border:1px solid var(--line);border-radius:var(--r);
+  background:var(--paper);padding:var(--s4) var(--s4) var(--s3);
+}
+.carddetail.in .detailinner{animation:detailIn .22s cubic-bezier(.2,.7,.3,1)}
+.carddetail.out .detailinner{opacity:0;transform:translateX(10px)}
+@media (max-width:1150px){
+  .savelist{flex-direction:column}
+  .carddetail{
+    flex-basis:auto;width:100%;max-height:0;opacity:0;position:static;
+    transition:max-height .3s ease,opacity .2s ease;
+  }
+  .savelist.open .carddetail{flex-basis:auto;max-height:3200px;opacity:1}
+  .detailinner{min-width:0;margin-top:var(--s3)}
+}
+
+/* v32：默认左表单与右列表 4:6 */
+.recordgrid{grid-template-columns:4fr 6fr}
+
+/* 必填标记 */
+.req{font-style:normal;color:var(--bad);font-size:11px;font-weight:600;margin-left:6px;vertical-align:1px}
+
+/* 引导图：类型按钮组、左右列表+详情 */
+.f-types{display:flex;gap:6px;margin-bottom:10px;animation:figIn .3s both}
+.f-types span{font-size:11px;padding:3px 10px;border:1px solid var(--line2);border-radius:3px;color:var(--ink2);background:#fff}
+.f-types span.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.f-split{display:flex;gap:10px;width:min(420px,92%);align-items:stretch}
+.f-minis{flex:1;display:flex;flex-direction:column;gap:5px}
+.f-minis i{display:block;height:18px;border:1px solid var(--line2);border-radius:3px;background:#fff;animation:figIn .4s both}
+.f-minis i:nth-child(2){animation-delay:.08s}
+.f-minis i:nth-child(3){animation-delay:.16s}
+.f-minis i.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);animation:figOn 2.9s ease infinite}
+.f-panel{flex:1.1;border:1px solid var(--line2);border-radius:4px;background:#fff;padding:8px;display:flex;flex-direction:column;gap:5px;animation:figPanel 2.9s ease infinite}
+.f-panel b{display:block;height:5px;border-radius:2px;background:var(--line)}
+.f-panel b:nth-child(1){width:40%;background:#cfcfcf}
+.f-panel b:nth-child(3){width:70%}
+@keyframes figPanel{0%,12%{opacity:0;transform:translateX(22px)}28%,82%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+@keyframes figOn{0%,20%{border-color:var(--line2);box-shadow:none}30%,85%{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}100%{border-color:var(--line2);box-shadow:none}}
+
+/* v42：导出页左右 55 开，左侧预览限高、可点开全文 */
+.exportgrid{display:grid;grid-template-columns:55fr 45fr;gap:var(--s5);align-items:start}
+.exportleft{min-width:0}
+.exportleft .paper{max-height:calc(100vh - 250px);overflow:auto;margin-bottom:0}
+.exportleft.expanded .paper{max-height:none}
+.paperfold{margin:var(--s2) 0 0;text-align:right}
+.exportright{min-width:0}
+.exportright .sign{margin:0}
+@media (max-width:1150px){
+  .exportgrid{grid-template-columns:1fr}
+  .exportleft .paper{max-height:none}
+}
+
+/* v42 收紧：底部不再给气泡留大空白；预览再限一点，导出页尽量一屏 */
+body{padding-bottom:40px}
+.exportleft .paper{max-height:calc(100vh - 300px)}
+
+.exportleft .paper{max-height:calc(100vh - 340px)}
+
+/* v43：导出页最后确认勾选区 */
+.declarebox{border:1px solid var(--line);border-radius:var(--r);padding:var(--s3);margin:var(--s3) 0 var(--s2);background:var(--card)}
+.declaretitle{font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:var(--s2)}
+.declarebox .opt{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.declarebox .opt:last-child{margin-bottom:0}
+.declarebox .opt input{margin-top:4px;flex:0 0 auto}
+.declarebox .opt b{font-weight:600}
+
+/* v44：记录页/导出页固定框架，左右各自滚动 */
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+header.top{flex:0 0 auto}
+#page{flex:1 1 auto;min-height:0;height:auto;width:100%;overflow:hidden}
+.view{height:100%;min-height:0}
+#v-record.on{display:block}
+#v-record .recordgrid{height:100%}
+.colform{height:100%;overflow-y:auto;padding-bottom:24px;padding-right:6px}
+.colreview{height:100%;overflow-y:auto;padding-right:6px}
+.savelist{min-height:0}
+.carddetail{top:var(--s4)}
+#v-export.on{display:flex;flex-direction:column;height:100%}
+#v-export .lead,#v-export .merge,#v-export .importbox{flex:0 0 auto}
+#v-export .exportgrid{flex:1 1 auto;min-height:0;height:auto}
+.exportleft{height:100%;display:flex;flex-direction:column;min-height:0}
+.exportleft .paper{max-height:none;flex:1 1 auto;min-height:0;overflow:auto}
+.exportright{height:100%;overflow-y:auto;padding-right:6px}
+@media (max-width:1150px){
+  html,body{height:auto}
+  body{display:block;overflow:visible;padding-bottom:40px}
+  #page{overflow:visible}
+  .view{height:auto}
+  #v-record .recordgrid{height:auto}
+  .colform,.colreview{height:auto;overflow:visible;padding-bottom:0}
+  #v-export.on{display:block;height:auto}
+  #v-export .exportgrid{height:auto}
+  .exportleft{height:auto;display:block}
+  .exportleft .paper{max-height:60vh}
+  .exportright{height:auto;overflow:visible}
+}
+
+/* 左栏滚动时，保存条贴在左栏底部，随时可点 */
+.colform .savebar{position:sticky;bottom:0;z-index:5;background:var(--paper);border-top:1px solid var(--line);box-shadow:none;margin-left:0;margin-right:0;padding:12px 0}
+
+/* v45：琉璃质感面板 + 明显边框 + 缓慢流光；保存条不再贴底 */
+.colform .savebar{position:static;margin-left:0;margin-right:0;padding:12px 0}
+@property --ga{syntax:'<angle>';initial-value:0deg;inherits:false}
+.glass{
+  position:relative;isolation:isolate;border-radius:10px;
+  background:linear-gradient(160deg,rgba(255,255,255,.98) 0%,rgba(247,247,247,.94) 55%,rgba(255,255,255,.97) 100%);
+  border:1px solid rgba(60,60,60,.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(0,0,0,.04),0 10px 28px rgba(0,0,0,.07),0 2px 6px rgba(0,0,0,.05);
+  transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease;
+}
+.glass::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;z-index:2;pointer-events:none;opacity:.5;
+  background:conic-gradient(from var(--ga,0deg),
+    rgba(255,255,255,0) 0deg, rgba(80,80,80,.55) 50deg, rgba(255,255,255,.95) 85deg,
+    rgba(80,80,80,.35) 125deg, rgba(255,255,255,0) 190deg, rgba(255,255,255,0) 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:glassspin 10s linear infinite;
+}
+@keyframes glassspin{to{--ga:360deg}}
+.glass:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 18px 40px rgba(0,0,0,.11),0 3px 8px rgba(0,0,0,.06)}
+.rcb{border:1px solid rgba(60,60,60,.24);border-radius:9px;background:linear-gradient(160deg,#fff,#f7f7f7);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 2px 6px rgba(0,0,0,.04);transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.rcb:hover{border-color:rgba(30,30,30,.45);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 20px rgba(0,0,0,.08)}
+.rcb.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink),0 8px 22px rgba(0,0,0,.09)}
+
+/* v45 修正：流光是双背景（padding-box + border-box），不再用 mask，避免盖住内容 */
+.glass::before{display:none;content:none}
+.glass{
+  border:1px solid transparent;
+  background:
+    linear-gradient(160deg,rgba(255,255,255,.99),rgba(247,247,247,.97) 55%,rgba(255,255,255,.99)) padding-box,
+    conic-gradient(from var(--ga,0deg),
+      rgba(90,90,90,.75) 0deg, rgba(30,30,30,.9) 40deg, rgba(190,190,190,.75) 85deg,
+      rgba(120,120,120,.7) 140deg, rgba(160,160,160,.7) 220deg, rgba(90,90,90,.75) 360deg) border-box;
+  background-origin:border-box;
+  animation:glassspin 12s linear infinite;
+}
+
+/* v45 修正2：玻璃面板内要留内边距，输入框边框加深保证在白底上看得见 */
+.sign{padding:16px 16px 12px}
+.reviewbox{padding:14px 16px 16px}
+.sign .field input,.sign .field textarea{border-color:rgba(60,60,60,.35);background:#fff}
+.card.form{padding:16px}
+
+/* v46：琉璃再柔和一档（边框减淡、阴影更散、圆角更大、流光更淡） */
+.glass{
+  border-radius:12px;
+  background:
+    linear-gradient(160deg,rgba(255,255,255,.99),rgba(251,251,251,.99) 60%,rgba(255,255,255,.99)) padding-box,
+    conic-gradient(from var(--ga,0deg),
+      rgba(208,208,208,.55) 0deg, rgba(168,168,168,.62) 70deg, rgba(232,232,232,.55) 140deg,
+      rgba(178,178,178,.58) 220deg, rgba(214,214,214,.55) 300deg, rgba(208,208,208,.55) 360deg) border-box;
+  background-origin:border-box;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 22px rgba(0,0,0,.045),0 1px 3px rgba(0,0,0,.03);
+  animation:glassspin 16s linear infinite;
+}
+.glass:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 30px rgba(0,0,0,.07),0 2px 6px rgba(0,0,0,.04)}
+.rcb{border-color:rgba(158,158,158,.4);border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 4px rgba(0,0,0,.03)}
+.rcb:hover{border-color:rgba(120,120,120,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 16px rgba(0,0,0,.06)}
+.rcb.on{border-color:rgba(60,60,60,.75);box-shadow:inset 0 0 0 1px rgba(60,60,60,.75),0 6px 18px rgba(0,0,0,.06)}
+.sign .field input,.sign .field textarea{border-color:rgba(150,150,150,.4)}
+
+/* v47：引导进度点 + 卡片柔化边框 */
+.coachdots{display:flex;gap:6px;margin:0 0 10px}
+.coachdots i{width:6px;height:6px;border-radius:50%;background:#d8d8d8;display:block;transition:background .2s ease,transform .2s ease}
+.coachdots i.done{background:#9a9a9a}
+.coachdots i.on{background:#111;transform:scale(1.3)}
+.coachcard{border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.06)}
+
+/* v48：引导图里"可切换"的元素轮流高亮 */
+.f-types.cycle span{animation:fTypeCycle 3.6s infinite}
+.f-types.cycle span:nth-child(2){animation-delay:1.2s}
+.f-types.cycle span:nth-child(3){animation-delay:2.4s}
+@keyframes fTypeCycle{
+  0%,30%{background:var(--brand);color:#fff;border-color:var(--brand)}
+  36%,100%{background:#fff;color:var(--ink2);border-color:var(--line2)}
+}
+.f-minis.cycle i{animation:fMiniCycle 3.9s infinite}
+.f-minis.cycle i:nth-child(2){animation-delay:1.3s}
+.f-minis.cycle i:nth-child(3){animation-delay:2.6s}
+@keyframes fMiniCycle{
+  0%,26%{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+  32%,100%{border-color:var(--line2);box-shadow:none}
+}
+
+/* v49：引导第 5 步的列表，每条轮流出现鼠标指针 + 点击波纹 */
+.f-minis.cycle i{position:relative}
+.f-minis.cycle i::after{
+  content:'';position:absolute;right:26px;top:6px;width:0;height:0;
+  border-left:8px solid #111;border-top:12px solid transparent;border-bottom:5px solid transparent;
+  transform:rotate(-20deg);opacity:0;pointer-events:none;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.25));
+  animation:fMiniCursor 3.9s infinite;
+}
+.f-minis.cycle i::before{
+  content:'';position:absolute;right:24px;top:8px;width:14px;height:14px;border-radius:50%;
+  border:1.5px solid rgba(0,0,0,.4);opacity:0;pointer-events:none;
+  animation:fMiniClick 3.9s infinite;
+}
+.f-minis.cycle i:nth-child(2)::after,.f-minis.cycle i:nth-child(2)::before{animation-delay:1.3s}
+.f-minis.cycle i:nth-child(3)::after,.f-minis.cycle i:nth-child(3)::before{animation-delay:2.6s}
+@keyframes fMiniCursor{
+  0%{opacity:0}
+  6%{opacity:1}
+  20%{opacity:1;transform:rotate(-20deg) scale(1)}
+  24%{opacity:1;transform:rotate(-20deg) scale(.85)}
+  30%,100%{opacity:0}
+}
+@keyframes fMiniClick{
+  0%{opacity:0;transform:scale(.4)}
+  8%{opacity:.9;transform:scale(.5)}
+  24%{opacity:0;transform:scale(1.8)}
+  100%{opacity:0;transform:scale(1.8)}
+}
+
+/* v49 修正：第 5 步面板常显（不再循环闪）；光标与波纹更明显 */
+.f-panel{animation:figIn .45s ease both}
+.f-minis.cycle i::after{
+  right:34px;top:5px;
+  border-left:11px solid #111;border-top:15px solid transparent;border-bottom:7px solid transparent;
+  filter:drop-shadow(0 0 1px #fff) drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+.f-minis.cycle i::before{right:32px;top:8px;width:18px;height:18px;border:2px solid rgba(0,0,0,.55)}
+
+/* v50：第 3 步三种类型的字段组随按钮一起轮换 */
+.f-fields{position:relative;width:100%;height:94px}
+.f-fg{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:8px;opacity:0;animation:fFgCycle 3.6s infinite}
+.fg-a{animation-delay:0s}
+.fg-r{animation-delay:1.2s}
+.fg-o{animation-delay:2.4s}
+@keyframes fFgCycle{
+  0%,30%{opacity:1;transform:translateY(0)}
+  32%{opacity:1;transform:translateY(0)}
+  38%,100%{opacity:0;transform:translateY(-3px)}
+}
+.f-tag{flex:0 0 42px}
+
+/* v51：第 3 步图里每组也带工具行，归类只 AI 有 */
+.f-fields{height:126px}
+.f-row{gap:6px}
+.f-in.tiny{height:26px;width:auto;min-width:64px;max-width:150px;padding:0 9px;justify-content:flex-start;box-shadow:none;border-color:var(--line2)}
+.f-in.tiny .f-drop{font-size:11px}
+.f-in.tiny.faint{border-style:dashed;opacity:.6}
+
+/* v51 修正：字段小标签不换行 */
+.f-tag{flex:0 0 56px;white-space:nowrap;font-size:10px}
+
+/* v53：去掉预览/详情里的小竖线，改用浅底块与分隔线 */
+.paper h3{
+  border-left:0;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:6px;
+  margin-top:22px;color:var(--ink);
+}
+.quote{border-left:0;background:#f6f6f6;border-radius:4px;padding:6px 10px;margin:4px 0}
+.q{border-left-width:1px;border-radius:6px}
+.q.mine{border-left-color:var(--line)}
+.q.miss{border-left:1px solid var(--line);border-color:var(--line)}
+
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="toprow">
+    <div class="brand">过程留痕</div>
+    <nav class="tabs">
+      <button class="tab on" data-view="record" type="button"><i>1</i>记录</button>
+      <button class="tab" data-view="export" type="button"><i>2</i>导出</button>
+    </nav>
+    <div class="toplinks">
+      <button class="bubble guide" type="button" id="btnGuide" title="一步一步带你走一遍">▶ 新手引导</button>
+      <a class="bubble" href="help.html" target="_blank" rel="noopener" title="帮助文档：怎么记、怎么看、怎么导出">帮助文档</a>
+    </div>
+  </div>
+</header>
+
+<main id="page">
+
+  <!-- 视图一：记录（左：记一条；右：已保存列表 + 详情） -->
+  <section class="view on" id="v-record">
+    <div class="recordgrid">
+      <div class="colform">
+        <p class="lead">用一次记一条：先选类型，填完点「保存这一条」。右边点一条看详情、选归类。</p>
+
+        <form class="card form glass" id="recForm" autocomplete="off">
+      <label class="field">
+        <span>你的名字<em class="req">必填</em><small>几条记录合并时靠它分人</small></span>
+        <input type="text" id="fMe">
+      </label>
+
+      <div class="types" id="typeRow">
+        <span class="typeslabel">这次记的是什么：</span>
+        <button class="type on" type="button" data-type="ai">AI</button>
+        <button class="type" type="button" data-type="ref">资料</button>
+        <button class="type" type="button" data-type="orig">原创</button>
+      </div>
+
+      <div class="row two">
+        <label class="field">
+          <span>用的工具</span>
+          <select id="fTool"></select>
+        </label>
+        <label class="field" id="slotWrap">
+          <span>归类<em class="req">必填</em><small>你自己选</small></span>
+          <select id="fSlot"></select>
+        </label>
+      </div>
+
+      <label class="field" id="toolOtherWrap" hidden>
+        <span>具体是哪个工具</span>
+        <input type="text" id="fToolOther">
+      </label>
+
+      <label class="field">
+        <span>AI 使用时间<small>选填，事后补记可以改</small></span>
+        <input type="datetime-local" id="fUsedAt">
+      </label>
+
+      <div id="fieldsAi">
+        <label class="field">
+          <span>1. 我问 AI 的话<em class="req">必填</em><small>原样贴，别改字</small></span>
+          <textarea id="fMine" rows="2"></textarea>
+        </label>
+        <label class="field">
+          <span>2. AI 回我的话<em class="req">必填</em><small>粘关键的那几行也行</small></span>
+          <textarea id="fTheirs" rows="2"></textarea>
+        </label>
+      </div>
+
+      <div id="fieldsRef" hidden>
+        <label class="field">
+          <span>资料名称或链接<em class="req">必填</em><small>原样记，方便以后查</small></span>
+          <textarea id="fRefName" rows="2"></textarea>
+        </label>
+        <label class="field">
+          <span>来源说明<small>哪个网站 / 哪本书 / 谁给的</small></span>
+          <textarea id="fRefSource" rows="2"></textarea>
+        </label>
+        <label class="field">
+          <span>用在哪一条记录上</span>
+          <textarea id="fRefUse" rows="2"></textarea>
+        </label>
+      </div>
+
+      <div id="fieldsOrig" hidden>
+        <label class="field">
+          <span>做了什么<em class="req">必填</em><small>自己画的图、剪的片子、写的段落都记这里</small></span>
+          <textarea id="fOrigWhat" rows="2"></textarea>
+        </label>
+        <label class="field">
+          <span>用了什么工具（选填）</span>
+          <input type="text" id="fOrigTool">
+        </label>
+      </div>
+
+      <div id="aiUseWrap">
+        <div class="usebox" id="useBox">
+          <span>是否采纳了 AI 的意见<em class="req">必填</em>：</span>
+          <button class="vbtn" type="button" data-use="direct">直接采用</button>
+          <button class="vbtn" type="button" data-use="partial">改了一点</button>
+          <button class="vbtn" type="button" data-use="rewrite">未采纳</button>
+        </div>
+        <label class="field" id="laterField" hidden>
+          <span id="laterLabel">怎么改的</span>
+          <textarea id="fLater" rows="2"></textarea>
+        </label>
+      </div>
+
+      <details class="extra">
+        <summary>加截图（可多张）或对话链接（可选）</summary>
+        <div class="row quickrow">
+          <label class="uploader">
+            <input type="file" id="fImg" accept="image/*" multiple hidden>
+            <span class="btn tiny" id="btnPickImg" role="button" tabindex="0">加截图</span>
+          </label>
+          <input type="text" id="fLink">
+        </div>
+        <div class="imglist" id="imgList" hidden></div>
+      </details>
+
+      <div class="savebar">
+        <button class="btn primary" type="submit" id="btnSaveTurns">保存这一条</button>
+        <span class="hint" id="formHint"></span>
+      </div>
+      <p class="tsline">记录时间 <b id="fTs"></b></p>
+        </form>
+      </div>
+
+      <div class="colreview">
+        <!-- 已保存列表：左边点一条，右边看详情 -->
+        <div class="reviewbox glass" id="reviewBox">
+          <div class="reviewhead">
+            <h2>已保存 <b id="savedCount">0</b> 条</h2>
+            <div class="trashbar"><button class="btn tiny" type="button" id="btnTrash">回收站 <span id="trashCount">0</span></button></div>
+          </div>
+          <div class="trashpanel" id="trashPanel" hidden></div>
+          <div class="meter" id="meter"></div>
+          <div class="savelist" id="savelist">
+            <div class="cardlist" id="cards"></div>
+            <aside class="carddetail" id="detail"><div class="detailinner glass" id="detailInner"></div></aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 视图二：出附录 -->
+  <section class="view" id="v-export">
+    <p class="lead">左边是预览，右边填完「本人负责」就能复制或导出 Word。</p>
+
+    <div class="importbox" id="importBox" hidden></div>
+
+    <div class="merge glass">
+      <b>几个人就是几台电脑，怎么合成一份？</b>
+      <span>各自点「导出我的记录」得到一个文件，发给你；你点「导入」选进来。重复导入不会多出一遍，每条都带着记的人。</span>
+      <div class="actions">
+        <button class="btn" type="button" id="btnExportJson">导出我的记录</button>
+        <button class="btn" type="button" id="btnImportJson">导入队友的记录</button>
+        <input type="file" id="fJson" accept="application/json,.json" hidden>
+      </div>
+    </div>
+
+    <div class="exportgrid">
+      <div class="exportleft" id="exportLeft">
+        <div class="paper glass" id="paper"></div>
+      </div>
+      <div class="exportright">
+        <div class="sign glass">
+          <label class="field">
+            <span>本人负责哪部分<small>必填，写进诚信声明</small></span>
+            <input type="text" id="fResp">
+          </label>
+          <div class="field">
+            <span>记录人（就是「记录」页顶部那个名字）</span>
+            <div class="signrow"><b id="signEcho">还没填</b><button class="btn tiny" type="button" id="btnFixSign">去填</button></div>
+          </div>
+          <label class="opt">
+            <input type="checkbox" id="fFull"> <span>连原始记录全文一起导出（给附加材料用；Word 正文建议不勾）</span>
+          </label>
+          <div class="declarebox">
+            <div class="declaretitle">最后确认（勾上后左下方才出现声明）</div>
+            <label class="opt"><input type="checkbox" id="fPromise"> <span>本人承诺：本作品中的 AI 使用情况与素材来源均已如实记录，未隐瞒、未虚构。</span></label>
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="button" id="btnCopy">复制全文</button>
+            <button class="btn" type="button" id="btnDoc">导出 Word（.doc）</button>
+            <button class="btn" type="button" id="btnDemo">载入示例记录</button>
+            <span class="hint" id="expHint"></span>
+          </div>
+          <p class="hint" style="margin-top:10px">「导出 Word」是把左边预览原样装进 .doc，一个字不加、不改排版逻辑；Word 打开后可再套你们自己的封面。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 新手引导：全屏压暗 + 屏幕正中的教程卡（每步一段小动画） -->
+<div class="coach" id="coach" hidden>
+  <div class="coachcard" id="coachCard">
+    <button class="coachmute" id="coachMute" type="button" aria-label="开关声音" title="开关声音">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+        <path d="M4 9h3.5L12 5.2v13.6L7.5 15H4z" fill="currentColor"/>
+        <path d="M15.5 9a4 4 0 0 1 0 6M18 6.6a7.5 7.5 0 0 1 0 10.8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+        <path class="slash" d="M4.5 19.5 L19.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="coachfig" id="coachFig"></div>
+    <div class="coachstep" id="coachStep"></div>
+    <div class="coachdots" id="coachDots"></div>
+    <h3 id="coachTitle"></h3>
+    <p id="coachText"></p>
+    <div class="coachops">
+      <button class="btn tiny" type="button" id="coachSkip">跳过</button>
+      <button class="btn tiny" type="button" id="coachPrev">上一步</button>
+      <button class="btn primary tiny" type="button" id="coachNext">下一步</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* seed.js */
+/* 示例记录：内容取自 2026-10-19 一次真实的选题讨论，用于演示流程。
+   demo 标记会在界面上显示【示例】，避免被当成真实交付数据。
+   注意：时刻为示意，只有日期是准的——真实时间戳要由产品当场自动打，不能事后补。 */
+window.SEED = [
+  {
+    id:'R001', ts:'2026-10-19 21:40', tool:'Qoder CN',
+    scene:'给 AIGC 大赛选赛道',
+    myWords:'这是学校的课程要求参加的比赛，用于期末考试，你觉得我适合选哪一个赛道，又有什么建议',
+    aiResult:'读了桌面上的通知 docx，结论选赛题一，理由是预赛权重 PPT 37.5% + 文档 25% + 视频 25% + AI 使用规范 12.5%，纸面表达比代码量值钱。',
+    later:'我一开始以为要挑技术最强的那条，看到权重表才发现讲清楚比做复杂值钱。',
+    verdict:'agree', slot:'关键 Prompt', demo:true
+  },
+  {
+    id:'R002', ts:'2026-10-19 22:05', tool:'Qoder CN',
+    scene:'从个人小站引申能做什么',
+    myWords:'从我的个人小站引申出来我可以做什么',
+    aiResult:'查了线上站点状态和本地项目代码，发现后端已有按 user_id 隔离的存储、通知已读回执、.ics 课表导入，于是推荐做社团通知回执台。',
+    later:'',
+    verdict:null, slot:'生成或开发过程', demo:true
+  },
+  {
+    id:'R003', ts:'2026-10-19 22:20', tool:'Qoder CN',
+    scene:'否掉社团方向',
+    myWords:'可是我目前对电赛社团还不熟悉啊',
+    aiResult:'撤回社团台账和实验数据两个方向，改判据为"只选我今天就在经历、数据正在自动产生的题"，落到过程留痕。',
+    later:'它假设我能组织社团，这个前提我一个月前就没建立起来。',
+    verdict:'agree', slot:'人工核查', demo:true
+  },
+  {
+    id:'R004', ts:'2026-10-19 23:10', tool:'Qoder CN',
+    scene:'追问 AI 辅助与代写的界线',
+    myWords:'但是防不住用户自己用AI填写啊',
+    aiResult:'承认防不住，放弃做 AI 文风检测，改成把原始记录并排显示，让编造的成本变高、核查的成本变零。',
+    later:'',
+    verdict:'agree', slot:'迭代优化', demo:true
+  },
+  {
+    id:'R005', ts:'2026-10-19 23:32', tool:'Qoder CN',
+    scene:'质疑产品应用性',
+    myWords:'评比是在比赛结束时，那这个项目的应用性就不是很高了',
+    aiResult:'承认需求锚点钉错，从"比赛要求"改钉到课程规范那句"完成学术任务时必须声明"，并把输出层改成可切换模板。',
+    later:'这个是我自己想到的，它之前一直在讲比赛。',
+    verdict:'agree', slot:'人工核查', demo:true
+  },
+  {
+    id:'R006', ts:'2026-10-19 22:30', tool:'Qoder CN',
+    scene:'定队友分工表',
+    myWords:'碰代码是什么意思，是指和AI聊天吗，我也不算碰代码吧',
+    aiResult:'承认用错了分工尺子，改按定规矩 / 提要求 / 验收 / 表达四类角色切，再按四人合并成四格。',
+    later:'',
+    verdict:null, slot:'迭代优化', demo:true
+  }
+];
+
+</script>
+<script>
+/* parse.js */
+/* 把"我的指令 / AI 的回复"两段文字切成若干轮，并给每轮挑一句重点。
+ *
+ * 一条记录的语义是"一次使用"，所以一次粘进多轮时必须拆成多条，每条各自有"后来怎么了"。
+ * 这里只做切分与摘句，一个字都不改写——挑出来的句子必须能在原文里逐字找到，
+ * 找不到就退回整段（verifyKey 兜底），绝不编造。
+ */
+(function () {
+'use strict';
+
+/* ---------- 清洗：从网页复制常见不可见字符 ----------
+   文心等产品的复制会带控制字符与零宽字符，它们进到记录里会污染附录与导出文件。 */
+function cleanText(value) {
+  return String(value == null ? '' : value)
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+    .replace(/[\u200b-\u200f\u202a-\u202e\ufeff]/g, '');
+}
+
+/* ---------- 切块：一轮 = 一块 ---------- */
+
+const SEP_LINE = /^\s*(?:-{3,}|={3,}|\*{3,}|—{3,}|_{3,})\s*$/;
+/* 「第 1 轮：」「第 1 问：」才算轮次标题；后面直接跟句号的普通句子（“第一问。”）不算，
+   否则标题会被剥掉、只剩一个句号进去。 */
+const TURN_HEAD = /^\s*(?:第\s*[0-9一二三四五六七八九十]+\s*(?:轮|次|问|回合)(?=\s*[:：]|\s*$)|轮次\s*[:：]|[【\[]\s*第?\s*[0-9一二三四五六七八九十]+\s*(?:轮|次)\s*[】\]]|回合\s*[0-9]+(?=\s*[:：]|\s*$))\s*[:：]?/;
+const NUM_HEAD = /^\s*(?:[0-9]{1,2}[.、)）]|[①②③④⑤⑥⑦⑧⑨⑩]|[(（]\s*[0-9]{1,2}\s*[)）]|[Qq]\s*[0-9]{1,2}\s*[:：.、])/;
+const TIME_HEAD = /^\s*\[?\s*(?:20[0-9]{2}[-/.])?\d{1,2}[-/.]\d{1,2}[ T]+\d{1,2}:\d{2}(?::\d{2})?\s*\]?\s*[|｜]?/;
+/* Markdown 标题形式的角色行，常见于 Claude Code / Qoder / Codex 的 /export 与各种导出工具：
+   `## User`、`## Assistant`、`### [2026-05-08 16:08:18] 用户`、`# ChatGPT`、
+   `#### AI [工具调用]`。这些标题本身是角色与时间，不该进正文，只当轮次边界。 */
+const MD_ROLE_HEAD = /^\s*#{1,6}\s*(?:\[[^\]]*\]\s*)*(?:用户|我|你|human|user|you|assistant|ai|chatgpt|claude|cursor|copilot|qoder|codex|gemini|豆包|通义|kimi|文心|元宝|助手|回答|提问)(?![A-Za-z])/i;
+
+function splitBlocks(text, mode) {
+  const raw = cleanText(text).replace(/\r/g, '').trim();
+  if (!raw) return [];
+  const lines = raw.split('\n');
+
+  // 1) 显式分隔线：--- / === / *** / ———
+  if (lines.some(l => SEP_LINE.test(l))) {
+    const out = [];
+    let cur = [];
+    for (const line of lines) {
+      if (SEP_LINE.test(line)) { if (cur.length) out.push(cur.join('\n').trim()); cur = []; }
+      else cur.push(line);
+    }
+    if (cur.length) out.push(cur.join('\n').trim());
+    return out.filter(Boolean);
+  }
+
+  // 1.5) Markdown 角色标题（## User / ### [时间] 用户 / # ChatGPT / ### AI [工具调用]）
+  if (lines.some(l => MD_ROLE_HEAD.test(l))) {
+    const out = [];
+    let cur = [];
+    for (const line of lines) {
+      if (MD_ROLE_HEAD.test(line)) { if (cur.length) out.push(cur.join('\n').trim()); cur = []; }
+      else cur.push(line);
+    }
+    if (cur.length) out.push(cur.join('\n').trim());
+    const blocks = out.filter(Boolean);
+    if (blocks.length > 1) return blocks;
+  }
+
+  // 2) "第 N 轮 / 轮次：/【第2次】/回合 3"
+  if (lines.some(l => TURN_HEAD.test(l))) {
+    const out = [];
+    let cur = [];
+    for (const line of lines) {
+      if (TURN_HEAD.test(line)) {
+        if (cur.length) out.push(cur.join('\n').trim());
+        cur = [line.replace(TURN_HEAD, '').trim()];
+      } else cur.push(line);
+    }
+    if (cur.length) out.push(cur.join('\n').trim());
+    return out.filter(Boolean);
+  }
+
+  // 3) 空行分段（最常见的粘贴形态）
+  const paras = raw.split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
+  if (paras.length > 1) return paras;
+
+  // 4) 整段没有空行时，靠行首编号 / 时间戳切
+  if (lines.length > 1 && lines.some(l => NUM_HEAD.test(l) || TIME_HEAD.test(l))) {
+    const out = [];
+    let cur = [];
+    let started = false;
+    for (const line of lines) {
+      const isHead = NUM_HEAD.test(line) || TIME_HEAD.test(line);
+      if (isHead && started && cur.length) { out.push(cur.join('\n').trim()); cur = []; }
+      if (isHead) started = true;
+      cur.push(line);
+    }
+    if (cur.length) out.push(cur.join('\n').trim());
+    return out.filter(Boolean);
+  }
+
+  /* 5) 手动复制最常见的情况：有换行、没空行、没编号。
+        只对"我问的话"按行切——用户一次提问通常就是一行；
+        AI 回复经常多行，按行切会把它撕碎，所以 answer 模式不做这一步。
+        收紧条件：每行都得像一次提问或一次反馈，否则宁可整段不切、让用户敲空行。 */
+  if (mode === 'question' && lines.length > 1 && raw.indexOf('```') === -1) {
+    const rows = lines.map(function (l) { return l.trim(); }).filter(Boolean);
+    const ASK_START = /^(帮|请|给我|把|改|写|生成|做个|做一下|解释|看看|找|优化|加|删|换|实现|告诉|整理|检查|修|还是|不对|不行|太小|太大|多一点|少一点|为什么|怎么|如何|能不能|可不可以)/;
+    const allLikeAsk = rows.length > 1 && rows.every(function (l) {
+      return l.length <= 80 && (ASK_START.test(l) || /[？?]$/.test(l));
+    });
+    if (allLikeAsk) return rows;
+  }
+
+  /* 6) 一段话里用分号/句号连着列好几件事（"帮我改 A；这个太土了；帮我加 B"）。
+        只对"我问的话"做，并要求切出来每一句都短、没有代码块。
+        宁可多切——切多了可以在卡片上删掉；少切了用户根本不知道能拆。 */
+  if (mode === 'question' && raw.indexOf('```') === -1) {
+    const parts = raw.split(/(?<=[。！？!?；;])/).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (parts.length > 1 && parts.every(function (p) { return p.length <= 60; })) return parts;
+  }
+
+  return [raw];
+}
+
+/* ---------- 配对：以提问条数为准 ----------
+   一问一答时，AI 回复里的空行多半是列表/段落，不能当成新的一次使用。
+   多轮时 AI 块多了就均匀并回去；少了是真的缺回复，留空标 unpaired。 */
+function pairTurns(meText, aiText) {
+  const me = splitBlocks(meText, 'question');
+  const aiRaw = splitBlocks(aiText, 'answer');
+
+  if (me.length <= 1) {
+    const mine = me[0] || '';
+    const theirs = aiRaw.join('\n\n');
+    if (!mine && !theirs) return [];
+    return [{ index: 1, mine: mine, theirs: theirs, unpaired: !mine || !theirs }];
+  }
+
+  let ai = aiRaw;
+  if (aiRaw.length > me.length) {
+    ai = [];
+    for (let i = 0; i < me.length; i++) {
+      const from = Math.floor(i * aiRaw.length / me.length);
+      const to = Math.floor((i + 1) * aiRaw.length / me.length);
+      ai.push(aiRaw.slice(from, to).join('\n\n'));
+    }
+  }
+
+  const turns = [];
+  for (let i = 0; i < me.length; i++) {
+    const mine = me[i] || '';
+    const theirs = ai[i] || '';
+    if (!mine && !theirs) continue;
+    turns.push({ index: i + 1, mine: mine, theirs: theirs, unpaired: !theirs || !mine });
+  }
+  return turns;
+}
+
+/* ---------- 分句（摘句用）：```代码块``` 整体保留 ---------- */
+
+function sentences(text) {
+  const raw = cleanText(text).replace(/\r/g, '');
+  if (!raw.trim()) return [];
+  const out = [];
+  const parts = raw.split(/(```[\s\S]*?```)/g);
+  for (const part of parts) {
+    if (!part) continue;
+    if (part.trim().startsWith('```')) { out.push(part.trim()); continue; }
+    part.split(/(?<=[。！？!?；;])|\n+/).map(s => s.trim()).filter(Boolean).forEach(s => out.push(s));
+  }
+  return out;
+}
+
+const ASK_RE = /(帮|请|给我|把|改|写|生成|做个|做一下|解释|看看|找|优化|加|删|换|实现|告诉|整理|检查|修|能不能|可不可以|如何|怎么|为什么)/;
+const RESULT_RE = /(所以|因此|结论|建议|可以这样|代码如下|第一步|总结|需要注意|简单说|也就是说|方案是)/;
+const LATER_RE = /(后来|最后|结果|发现|改成|补了|重写|退回|挂了|报错|重新|才发现|于是)/;
+
+function longest(list) {
+  let best = '', at = -1;
+  list.forEach(function (s, i) { if (s.length > best.length) { best = s; at = i; } });
+  return { text: best, index: at };
+}
+
+/** 每轮挑重点：指令挑含祈使动词的、回复优先整块代码其次结论句、后来挑转折句。 */
+function pickKey(turn) {
+  const mine = sentences(turn.mine);
+  const theirs = sentences(turn.theirs);
+  const later = sentences(turn.later || '');
+
+  const askAt = mine.findIndex(s => ASK_RE.test(s));
+  let keyMine = askAt >= 0 ? mine[askAt] : (longest(mine).text || '');
+  if (!keyMine) keyMine = String(turn.mine || '').trim();
+
+  const codeAt = theirs.findIndex(s => s.trim().startsWith('```'));
+  const resAt = theirs.findIndex(s => RESULT_RE.test(s));
+  let keyTheirs = codeAt >= 0 ? theirs[codeAt] : (resAt >= 0 ? theirs[resAt] : (theirs[0] || ''));
+
+  const lateAt = later.findIndex(s => LATER_RE.test(s));
+  const keyLater = lateAt >= 0 ? later[lateAt] : (later[0] || '');
+
+  return { keyMine: keyMine, keyTheirs: keyTheirs, keyLater: keyLater };
+}
+
+/** 这一轮里所有可复用的句子，给"漏了哪句点一下插回去"用。 */
+function sentencePool(turn) {
+  return {
+    mine: sentences(turn.mine),
+    theirs: sentences(turn.theirs),
+    later: sentences(turn.later || '')
+  };
+}
+
+/** 摘句必须能在原文里逐字找到；找不到就退回整段（宁可长，绝不编）。 */
+function verifyKey(sentence, source) {
+  const norm = function (s) { return String(s == null ? '' : s).replace(/\s+/g, ''); };
+  const s = String(sentence == null ? '' : sentence).trim();
+  if (!s) return '';
+  if (norm(source).includes(norm(s))) return s;
+  return String(source == null ? '' : source).trim();
+}
+
+window.LHP = {
+  cleanText: cleanText,
+  splitBlocks: splitBlocks,
+  pairTurns: pairTurns,
+  sentences: sentences,
+  pickKey: pickKey,
+  sentencePool: sentencePool,
+  verifyKey: verifyKey
+};
+})();
+
+</script>
+<script>
+/* app.js */
+(function(){
+'use strict';
+
+const KEY='liuhen-records-v1';
+const TOOLS=['DeepSeek','豆包','Kimi','通义千问','腾讯元宝','文心一言','即梦','Qoder CN','ChatGPT','Claude','Cursor','Copilot','Photoshop','剪映','Figma','Canva','WPS AI','其他'];
+const TYPES=[['ai','AI'],['ref','资料'],['orig','原创']];
+const TYPE_LABEL={ai:'AI',ref:'资料',orig:'原创'};
+const SLOTS=['关键 Prompt','生成或开发过程','迭代优化','测试验证','人工核查'];
+const SLOT_LABEL={
+  'AI 工具使用':'一、AI 工具使用',
+  '关键 Prompt':'二、关键 Prompt',
+  '生成或开发过程':'三、生成或开发过程',
+  '迭代优化':'四、迭代优化',
+  '测试验证':'五、测试验证',
+  '人工核查':'六、人工核查'
+};
+const ORDER=['关键 Prompt','生成或开发过程','迭代优化','测试验证','人工核查'];
+const USE_LABEL={direct:'直接采用',partial:'改了一点',rewrite:'未采纳'};
+
+let db=load();
+db.forEach(r=>{ if(r.verdict==='partial') r.verdict='agree'; });
+let me=(localStorage.getItem('liuhen-me')||localStorage.getItem('liuhen-sign')||'').trim();
+db.forEach(r=>{ if(r.owner==null) r.owner=me; });
+let filter='all';
+let includeFull=false;
+let firstPaint=true;
+let pendingImport=null;
+
+function fpOf(r){
+  return [r.owner||'',r.ts||'',r.scene||'',String(r.myWords||r.aiResult||'').replace(/\s+/g,'').slice(0,24)].join('|');
+}
+function ownerMap(rows){
+  const m={};
+  rows.forEach(r=>{ const k=r.owner||'未填名字'; m[k]=(m[k]||0)+1; });
+  return m;
+}
+function isMulti(){ return Object.keys(ownerMap(db)).length>1; }
+function isForeign(r){ return !!r.inp && (r.owner||'')!==me; }
+
+function load(){
+  try{ const raw=localStorage.getItem(KEY); if(raw){const a=JSON.parse(raw); if(Array.isArray(a)) return a;} }catch(e){}
+  return [];
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(db)); }catch(e){} }
+
+/* ---------- 回收站：删掉先进这里，能恢复，也能彻底删除 ----------
+   删除不直接从 db 里消失，是为了"点错了能救回来"；附录统计只看 db，所以回收站里的不参与。 */
+const TRASH_KEY='liuhen-trash-v1';
+let trash=loadTrash();
+let pendingDelId=null, pendingDelTimer=null, pendingPurgeId=null;
+
+function loadTrash(){
+  try{ const raw=localStorage.getItem(TRASH_KEY); if(raw){ const a=JSON.parse(raw); if(Array.isArray(a)) return a; } }catch(e){}
+  return [];
+}
+function saveTrash(){ try{ localStorage.setItem(TRASH_KEY, JSON.stringify(trash.slice(0,100))); }catch(e){} }
+function moveToTrash(id){
+  const i=db.findIndex(function(r){ return r.id===id; });
+  if(i<0) return false;
+  const rec=db.splice(i,1)[0];
+  rec.deletedAt=nowStr();
+  trash.unshift(rec);
+  if(trash.length>100) trash.length=100;
+  save(); saveTrash();
+  return true;
+}
+function restoreFromTrash(id){
+  const i=trash.findIndex(function(r){ return r.id===id; });
+  if(i<0) return false;
+  const rec=trash.splice(i,1)[0];
+  delete rec.deletedAt;
+  if(findRec(rec.id)) rec.id=nextId();   // 编号被新记录占了就重排
+  db.unshift(rec);
+  save(); saveTrash();
+  return true;
+}
+function purgeFromTrash(id){
+  const i=trash.findIndex(function(r){ return r.id===id; });
+  if(i<0) return false;
+  trash.splice(i,1);
+  saveTrash();
+  return true;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function pad(n){ return n<10?'0'+n:''+n; }
+function nowStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function nextId(){
+  let max=0;
+  db.forEach(r=>{ const n=parseInt(String(r.id).replace(/\D/g,''),10); if(n>max) max=n; });
+  return 'R'+String(max+1).padStart(3,'0');
+}
+
+function classify(r){
+  const t=(r.myWords+' '+r.aiResult+' '+r.later);
+  if(/核查|核实|查了|查不到|没查到|删了|发现|确认过|手算|真机|实测/.test(t)) return '人工核查';
+  if(/测|跑|试|挂了|报错|断言|预览|崩/.test(t)) return '测试验证';
+  if(/不对|还是错|改|否掉|换成|又问|重做|退回|推翻/.test(t)) return '迭代优化';
+  if(/代码|生成|写了|给出|实现|界面|函数|文件|页面/.test(t)) return '生成或开发过程';
+  return '关键 Prompt';
+}
+
+/* 只有 AI 记录、并且明确选了「改了一点 / 未采纳」才要求写如何处理；直接采用不需要 */
+function needsLater(r){
+  return (r.type||'ai')==='ai' && (r.use==='partial'||r.use==='rewrite');
+}
+
+/* ---------- 视图切换 ---------- */
+function showView(name){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.view===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+name));
+  if(name==='record') renderList();
+  if(name==='export') renderExport();
+}
+
+/* ---------- 记一条 ---------- */
+let tmpImgs=[];          /* 本次最多 6 张：{src, note} */
+let formType='ai';
+let formUse=null;
+let selectedId='';
+let promiseOK=false;
+
+/* 截图压成 JPEG dataURL，避免原图把 localStorage 撑爆 */
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=function(){
+      const max=900;
+      let w=img.width,h=img.height;
+      if(w>max||h>max){ const k=Math.min(max/w,max/h); w=Math.round(w*k); h=Math.round(h*k); }
+      const c=document.createElement('canvas');
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg',0.72));
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); reject(new Error('图片读不出来')); };
+    img.src=url;
+  });
+}
+
+/* 图注提示按类型变：资料不出现「这张图是我画的」 */
+function imgNotePh(){
+  if(formType==='ref') return '这图是什么、从哪来的';
+  if(formType==='orig') return '这张图是我画的';
+  return '这张图是什么';
+}
+
+function renderImgList(){
+  const box=document.getElementById('imgList');
+  if(!box) return;
+  if(!tmpImgs.length){ box.hidden=true; box.innerHTML=''; return; }
+  box.hidden=false;
+  const ph=imgNotePh();
+  box.innerHTML=tmpImgs.map(function(it,i){
+    return '<div class="imgitem">'+
+      '<span class="imgthumb"><img src="'+it.src+'" alt="截图 '+(i+1)+'"></span>'+
+      '<input type="text" class="imgnote" data-i="'+i+'" value="'+esc(it.note||'')+'" placeholder="'+esc(ph)+'">'+
+      '<button class="vbtn" type="button" data-drop="'+i+'">删这张</button>'+
+    '</div>';
+  }).join('');
+  box.querySelectorAll('[data-drop]').forEach(function(b){
+    b.addEventListener('click',function(){ tmpImgs.splice(+b.dataset.drop,1); renderImgList(); });
+  });
+  box.querySelectorAll('.imgnote').forEach(function(inp){
+    inp.addEventListener('input',function(){
+      const it=tmpImgs[+inp.dataset.i]; if(it) it.note=inp.value;
+    });
+  });
+}
+
+async function addImgs(files){
+  const list=Array.prototype.slice.call(files||[]);
+  if(!list.length) return;
+  for(let i=0;i<list.length;i++){
+    if(tmpImgs.length>=6){ hint('一次最多附 6 张图',true); break; }
+    try{ tmpImgs.push({src:await compressImage(list[i]),note:''}); }
+    catch(e){ hint('有张图读不出来，换一张试试',true); }
+  }
+  renderImgList();
+}
+/* 重点句永远从当前内容里重算：内容被增删过，旧的摘句就作废了。 */
+function recomputeKey(t) {
+  const k = window.LHP.pickKey(t);
+  return {
+    mine: window.LHP.verifyKey(k.keyMine, t.mine),
+    theirs: window.LHP.verifyKey(k.keyTheirs, t.theirs),
+    later: window.LHP.verifyKey(k.keyLater, t.later || '')
+  };
+}
+
+function val(id){ const el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+
+/* 必填项全部填好之前，「保存这一条」保持禁用，并在旁边说清还差什么 */
+function saveBlocker(){
+  if(!me.trim()) return '先填你的名字';
+  if(!val('fTool')) return '选一下用的工具';
+  if(document.getElementById('fTool').value==='其他' && !val('fToolOther')) return '填具体工具名';
+  if(formType==='ai'){
+    if(!val('fSlot')) return '选一下归类';
+    if(!val('fMine')) return '填「我问 AI 的话」';
+    if(!val('fTheirs')) return '填「AI 回我的话」';
+    if(!formUse) return '选一下是否采纳';
+    if(formUse==='partial' && !val('fLater')) return '写一句怎么改的';
+    if(formUse==='rewrite' && !val('fLater')) return '写一句为什么没用';
+  } else if(formType==='ref'){
+    if(!val('fRefName')) return '写资料名称或链接';
+  } else {
+    if(!val('fOrigWhat')) return '写一句你做了什么';
+  }
+  return '';
+}
+function updateSaveBtn(){
+  const btn=document.getElementById('btnSaveTurns');
+  if(!btn) return;
+  const miss=saveBlocker();
+  btn.disabled=!!miss;
+  hint(miss?('还差：'+miss):'', false);
+}
+
+function resetForm(focusId){
+  ['fMine','fTheirs','fRefName','fRefSource','fRefUse','fOrigWhat','fOrigTool','fLater','fUsedAt','fLink','fToolOther']
+    .forEach(function(id){ const el=document.getElementById(id); if(el) el.value=''; });
+  tmpImgs=[]; renderImgList();
+  formUse=null; updateUseUI();
+  formType='ai';
+  const toolSel=document.getElementById('fTool');
+  if(toolSel) toolSel.selectedIndex=0;
+  const slotSel2=document.getElementById('fSlot');
+  if(slotSel2) slotSel2.value='';
+  updateTypeUI();
+  document.getElementById('fTs').textContent=nowStr();
+  const btn=document.getElementById('btnSaveTurns');
+  btn.disabled=false; btn.textContent='保存这一条';
+  updateSaveBtn();
+  selectedId='';
+  renderList();
+  if(focusId){
+    const el=document.querySelector('.rcb[data-id="'+focusId+'"]');
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('flash'); setTimeout(function(){ el.classList.remove('flash'); },2400); }
+  }
+}
+
+function readTool(){
+  const sel=document.getElementById('fTool');
+  let tool=sel.value;
+  if(!tool){ hint('选一下用的工具', true); return null; }
+  if(tool==='其他'){
+    const own=val('fToolOther');
+    if(!own){ hint('选了「其他」，把具体工具名写上', true); return null; }
+    tool=own;
+  }
+  return tool;
+}
+
+function saveTurns() {
+  const tool=readTool();
+  if(tool===null) return;
+  const link=val('fLink');
+  const stamp=nowStr();
+  const usedAt=val('fUsedAt').replace('T',' ').slice(0,16);
+
+  if(formType!=='ai'){
+    const rec={
+      id:nextId(), ts:stamp, usedAt:usedAt, tool:tool, owner:me, type:formType,
+      scene:'', myWords:'', aiResult:'', later:'', use:null,
+      refName:'', refSource:'', refUse:'', origWhat:'', origTool:'',
+      imgs:tmpImgs.slice(), img:'', imgNote:'', link:link,
+      key:{}, verdict:null, slot:null, editedSlot:false, editedLater:false
+    };
+    if(formType==='ref'){
+      rec.refName=val('fRefName'); rec.refSource=val('fRefSource'); rec.refUse=val('fRefUse');
+      if(!rec.refName){ hint('至少写一条资料名称或链接', true); return; }
+      rec.scene=rec.refName.replace(/\s+/g,' ').slice(0,40);
+    } else {
+      rec.origWhat=val('fOrigWhat'); rec.origTool=val('fOrigTool');
+      if(!rec.origWhat){ hint('至少写一句你做了什么', true); return; }
+      rec.scene=rec.origWhat.replace(/\s+/g,' ').slice(0,40);
+    }
+    db.unshift(rec); save(); resetForm(rec.id);
+    toast('已保存 1 条');
+    return;
+  }
+
+  if(!val('fSlot')){ hint('选一下归类', true); return; }
+  const mine=val('fMine'), theirs=val('fTheirs');
+  if(!mine){ hint('填「我问 AI 的话」', true); return; }
+  if(!theirs){ hint('填「AI 回我的话」', true); return; }
+  const use=formUse||null;
+  const later=val('fLater');
+  if((use==='partial'||use==='rewrite') && !later){
+    hint(use==='partial'?'选了「改了一点」，写一句怎么改的':'选了「未采纳」，写一句为什么没用', true);
+    return;
+  }
+  const key=recomputeKey({mine:mine, theirs:theirs, later:later});
+  const scene=String(key.mine||mine||key.theirs||theirs).replace(/\s+/g,' ').slice(0,40);
+  const rec={
+    id:nextId(), ts:stamp, usedAt:usedAt, tool:tool, owner:me, type:'ai',
+    scene:scene||'（没写场景）',
+    myWords:mine, aiResult:theirs, later:later,
+    refName:'', refSource:'', refUse:'', origWhat:'', origTool:'',
+    imgs:tmpImgs.slice(), img:'', imgNote:'', link:link,
+    use:use,
+    key:{mine:key.mine||'', theirs:key.theirs||'', later:''},
+    verdict:null, slot:(val('fSlot')||null), editedSlot:false, editedLater:!!later
+  };
+  db.unshift(rec);
+  save();
+  resetForm(rec.id);
+  toast('已保存 1 条');
+}
+
+/* 表单里类型/采纳状态对应的显隐。图注提示也跟着类型变。 */
+function updateUseUI(){
+  document.querySelectorAll('#useBox .vbtn').forEach(function(b){
+    b.classList.toggle('on-use', b.dataset.use===formUse);
+  });
+  const f=document.getElementById('laterField');
+  const lab=document.getElementById('laterLabel');
+  if(!f) return;
+  if(!formUse || formUse==='direct'){
+    f.hidden=true;
+    return;
+  }
+  f.hidden=false;
+  if(formUse==='partial') lab.innerHTML='怎么改的';
+  else lab.innerHTML='为什么没用 AI 的';
+}
+
+function updateTypeUI(){
+  document.querySelectorAll('#typeRow .type').forEach(function(b){
+    b.classList.toggle('on', b.dataset.type===formType);
+  });
+  document.getElementById('fieldsAi').hidden=(formType!=='ai');
+  document.getElementById('fieldsRef').hidden=(formType!=='ref');
+  document.getElementById('fieldsOrig').hidden=(formType!=='orig');
+  document.getElementById('aiUseWrap').hidden=(formType!=='ai');
+  const sw=document.getElementById('slotWrap');
+  if(sw) sw.hidden=(formType!=='ai');
+  renderImgList();
+}
+
+function initRecord() {
+  const ts = document.getElementById('fTs');
+  const sel = document.getElementById('fTool');
+  const otherWrap = document.getElementById('toolOtherWrap');
+  ts.textContent = nowStr();
+
+  const meIn = document.getElementById('fMe');
+  meIn.value = me;
+  meIn.addEventListener('input', function () {
+    me = meIn.value.trim();
+    localStorage.setItem('liuhen-me', me);
+    db.forEach(function (r) { if (!r.inp && !r.owner) r.owner = me; });
+    save();
+    if (document.getElementById('v-export').classList.contains('on')) renderExport();
+  });
+
+  sel.innerHTML='<option value="">请选择使用工具</option>';
+  TOOLS.forEach(function (t) {
+    const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o);
+  });
+  const slotSel=document.getElementById('fSlot');
+  if(slotSel) slotSel.innerHTML='<option value="">请选择归类</option>'+
+    SLOTS.map(function(x){ return '<option>'+x+'</option>'; }).join('');
+  sel.addEventListener('change', function () {
+    const isOther = sel.value === '其他';
+    otherWrap.hidden = !isOther;
+    if (isOther) document.getElementById('fToolOther').focus();
+  });
+
+  document.querySelectorAll('#typeRow .type').forEach(function(b){
+    b.addEventListener('click', function(){
+      if(formType===b.dataset.type) return;
+      formType=b.dataset.type;
+      updateTypeUI(); updateUseUI(); updateSaveBtn();
+    });
+  });
+  document.querySelectorAll('#useBox .vbtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      const u=b.dataset.use;
+      formUse=(formUse===u)?null:u;
+      updateUseUI(); updateSaveBtn();
+    });
+  });
+
+  document.getElementById('btnPickImg').addEventListener('click', function () { document.getElementById('fImg').click(); });
+  document.getElementById('fImg').addEventListener('change', function (e) {
+    addImgs(e.target.files);
+    e.target.value='';
+  });
+
+  document.getElementById('recForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    saveTurns();
+  });
+  /* 任何输入/下拉变化都重算一次必填，决定保存按钮能不能点 */
+  document.getElementById('recForm').addEventListener('input', updateSaveBtn);
+  document.getElementById('recForm').addEventListener('change', updateSaveBtn);
+}
+
+function hint(msg,bad){
+  const el=document.getElementById('formHint');
+  el.textContent=msg||''; el.classList.toggle('bad',!!bad);
+}
+
+/* ---------- 逐条过 ---------- */
+function renderTrash(){
+  const cnt = document.getElementById('trashCount');
+  if(cnt) cnt.textContent = String(trash.length);
+  const panel = document.getElementById('trashPanel');
+  if(!panel) return;
+  if(!trash.length){ panel.innerHTML = '<p class="hint">回收站是空的。</p>'; return; }
+  panel.innerHTML = '<p class="hint">这里的不参与附录统计。恢复会放回列表；彻底删除就再也找不回来。</p>' +
+    trash.map(function(r){
+      return '<div class="trashitem"><div class="trashmain"><b>' + esc(r.scene || '（没写场景）') + '</b>' +
+        '<span class="hint">' + esc(r.ts || '') + ' · ' + esc(r.deletedAt || '') + ' 删除</span></div>' +
+        '<div class="trashops">' +
+          '<button class="vbtn" type="button" data-act="restore" data-id="' + esc(r.id) + '">恢复</button>' +
+          '<button class="vbtn' + (pendingPurgeId===r.id ? ' on-disagree' : '') + '" type="button" data-act="purge" data-id="' + esc(r.id) + '">' +
+            (pendingPurgeId===r.id ? '确认彻底删除' : '彻底删除') + '</button>' +
+        '</div></div>';
+    }).join('');
+}
+
+/* ---------- 已保存列表：左边点一条，右边看详情 ---------- */
+function renderList(){
+  const cnt=document.getElementById('savedCount');
+  if(cnt) cnt.textContent=String(db.length);
+  const aiN=db.filter(r=>(r.type||'ai')==='ai').length;
+  const refN=db.filter(r=>r.type==='ref').length;
+  const origN=db.filter(r=>r.type==='orig').length;
+  const items=[
+    ['all','共 '+db.length+' 条',''],
+    ['ai','AI '+aiN,''],
+    ['ref','资料 '+refN,''],
+    ['orig','原创 '+origN,'']
+  ];
+  const meter=document.getElementById('meter');
+  if(meter) meter.innerHTML=items.map(function(it){
+    return '<span class="'+(it[2]||'')+(filter===it[0]?' on':'')+'" data-filter="'+it[0]+'" role="button" tabindex="0">'+it[1]+'</span>';
+  }).join('');
+
+  let list=db;
+  if(filter==='ai') list=db.filter(r=>(r.type||'ai')==='ai');
+  if(filter==='ref') list=db.filter(r=>r.type==='ref');
+  if(filter==='orig') list=db.filter(r=>r.type==='orig');
+
+  const box=document.getElementById('cards');
+  if(!list.length){
+    box.innerHTML='<div class="empty">'+(db.length?'这个筛选下没有记录':'还没有记录。在上面填一条，点「保存这一条」。')+'</div>';
+    renderDetail(null);
+    return;
+  }
+  if(selectedId && !list.some(function(r){ return r.id===selectedId; })) selectedId='';
+  box.innerHTML=list.map(cardBrief).join('');
+  renderDetail(selectedId?findRec(selectedId):null);
+}
+
+function cardBrief(r){
+  const t=r.type||'ai';
+  const id=esc(r.id);
+  const opts=['<option value="">未归类</option>'].concat(SLOTS.map(function(s){
+    return '<option'+(s===r.slot?' selected':'')+'>'+s+'</option>';
+  })).join('');
+  const slotSel=t==='ai'
+    ? '<select class="slotmini" data-act="slot" data-id="'+id+'" title="归类，你自己选">'+opts+'</select>'
+    : '';
+  return '<article class="rcb'+(r.id===selectedId?' on':'')+'" data-id="'+id+'">'+
+    '<div class="rchead">'+
+      '<time>'+esc(r.ts)+'</time>'+
+      '<span class="tool type-'+t+'">'+esc(TYPE_LABEL[t])+'</span>'+
+      '<span class="tool">'+esc(r.tool)+'</span>'+
+      slotSel+
+      '<span class="vtag">'+id+'</span>'+
+    '</div>'+
+    '<div class="rctitle">'+esc(r.scene||'（没写内容）')+'</div>'+
+  '</article>';
+}
+
+function renderDetail(r){
+  const box=document.getElementById('detail');
+  const inner=document.getElementById('detailInner');
+  const wrap=document.getElementById('savelist');
+  if(!box||!inner) return;
+  if(!r){
+    box.classList.remove('in','out');
+    if(wrap) wrap.classList.remove('open');
+    inner.innerHTML='';
+    return;
+  }
+  inner.innerHTML=detailHtml(r);
+  if(wrap) wrap.classList.add('open');
+  box.classList.remove('out');
+  box.classList.remove('in');
+  void box.offsetWidth;
+  box.classList.add('in');
+}
+
+function detailHtml(r){
+  const t=r.type||'ai';
+  const id=esc(r.id);
+  const laterText=String(r.later||'').trim();
+  const fr=isForeign(r);
+  const who=r.owner||'记这条的人';
+  const imgs=Array.isArray(r.imgs)&&r.imgs.length?r.imgs:(r.img?[{src:r.img,note:r.imgNote||''}]:[]);
+  const imgHtml=imgs.length
+    ? '<div class="thumbrow">'+imgs.map(function(it){
+        return '<span class="imgthumb big"><img src="'+esc(it.src)+'" alt="截图">'+(it.note?'<i>'+esc(it.note)+'</i>':'')+'</span>';
+      }).join('')+'</div>'
+    : '';
+
+  function useBtn(val){
+    return '<button class="vbtn'+(r.use===val?' on-use':'')+'" data-act="use" data-use="'+val+'" data-id="'+id+'" type="button"'+
+      (fr?' disabled':'')+'>'+USE_LABEL[val]+'</button>';
+  }
+  const useBox=t==='ai'
+    ? '<div class="usebox"><span>这次怎么用的：</span>'+useBtn('direct')+useBtn('partial')+useBtn('rewrite')+'</div>'
+    : '';
+
+  let laterHtml='';
+  if(t==='ai'){
+    if(r.use==='direct'){
+      laterHtml='<div class="q mine"><em>如何处理 · 直接采用</em>直接采用，不需要再写处理说明。</div>';
+    } else if(!laterText){
+      laterHtml=fr
+        ? '<div class="q miss"><em>如何处理 · 只能 '+esc(who)+' 自己写</em>这条是合并进来的，你在这台设备上替他写不了。</div>'
+        : '<div class="q miss"><em>如何处理</em>'+
+        '<textarea rows="2" data-act="laterInput" data-id="'+id+'"></textarea>'+
+        '<button class="vbtn" data-act="saveLater" data-id="'+id+'" type="button" style="margin-top:7px">存这一句</button></div>';
+    } else {
+      laterHtml='<div class="q mine"><em>如何处理 · '+(fr?esc(who)+' 本人':'本人')+'</em>'+esc(r.later)+'</div>'+
+        (fr?'':('<div class="presets"><button class="vbtn" data-act="editLater" data-id="'+id+'" type="button">手动改这一句</button></div>'));
+    }
+  }
+
+  let bodyHtml='';
+  if(t==='ai'){
+    bodyHtml=(r.myWords?'<div class="q"><em>我说的话 · 原样引用</em>'+esc(r.myWords)+'</div>':'')+
+             (r.aiResult?'<div class="q"><em>它给的结果 · 原样引用</em>'+esc(r.aiResult)+'</div>':'');
+  } else if(t==='ref'){
+    bodyHtml=(r.refName?'<div class="q"><em>资料名称或链接</em>'+esc(r.refName)+'</div>':'')+
+             (r.refSource?'<div class="q"><em>来源说明</em>'+esc(r.refSource)+'</div>':'')+
+             (r.refUse?'<div class="q"><em>用在哪一条记录上</em>'+esc(r.refUse)+'</div>':'');
+  } else {
+    bodyHtml=(r.origWhat?'<div class="q"><em>做了什么</em>'+esc(r.origWhat)+'</div>':'')+
+             (r.origTool?'<div class="q"><em>用的工具</em>'+esc(r.origTool)+'</div>':'');
+  }
+
+  return '<div class="detailhead">'+
+      '<b class="vtag">'+id+'</b>'+
+      '<span class="hint">'+(isMulti()?esc(r.owner||'未填名字')+' · ':'')+esc(TYPE_LABEL[t])+'</span>'+
+      '<button class="vbtn'+(pendingDelId===r.id?' on-disagree':'')+'" type="button" data-act="del" data-id="'+id+'">'+
+        (pendingDelId===r.id?'确认删除（再点一次）':'删除这条')+'</button>'+
+    '</div>'+
+    bodyHtml+
+    imgHtml+
+    (r.link?'<div class="thumblink">原始链接：'+esc(r.link)+'</div>':'')+
+    useBox+
+    laterHtml;
+}
+
+function findRec(id){ for(let i=0;i<db.length;i++){ if(db[i].id===id) return db[i]; } return null; }
+
+function selectRec(id){
+  if(selectedId===id){
+    selectedId='';
+    renderList();
+    return;
+  }
+  selectedId=id;
+  renderList();
+  const d=document.getElementById('detail');
+  if(d&&d.scrollIntoView) d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function setFilter(name){ filter=name; renderList(); }
+
+function bindReview(){
+  const tp=document.getElementById('trashPanel');
+  tp.addEventListener('click',function(e){
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const id=b.dataset.id;
+    if(b.dataset.act==='restore'){
+      if(restoreFromTrash(id)){ renderTrash(); renderList(); toast('已恢复'); }
+      return;
+    }
+    if(b.dataset.act==='purge'){
+      if(pendingPurgeId===id){ pendingPurgeId=null; purgeFromTrash(id); renderTrash(); toast('已彻底删除，找不回来了'); }
+      else { pendingPurgeId=id; renderTrash(); }
+      return;
+    }
+  });
+  document.getElementById('btnTrash').addEventListener('click',function(){
+    const p=document.getElementById('trashPanel');
+    p.hidden=!p.hidden;
+    if(!p.hidden) renderTrash();
+  });
+
+  document.getElementById('meter').addEventListener('click',function(e){
+    const s=e.target.closest('span[data-filter]');
+    if(s) setFilter(s.dataset.filter);
+  });
+
+  const cards=document.getElementById('cards');
+  cards.addEventListener('click',function(e){
+    if(e.target.closest('select')) return;
+    const a=e.target.closest('.rcb'); if(!a) return;
+    selectRec(a.dataset.id);
+  });
+  cards.addEventListener('change',function(e){
+    const s=e.target.closest('select[data-act="slot"]'); if(!s) return;
+    const r=findRec(s.dataset.id); if(!r) return;
+    if(r.slot===s.value) return;
+    r.slot=s.value; r.editedSlot=true; save(); renderList();
+    toast(r.slot?('归类：'+r.slot):'已清掉归类');
+  });
+
+  const detail=document.getElementById('detail');
+  detail.addEventListener('click',function(e){
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const r=findRec(b.dataset.id); if(!r) return;
+    const act=b.dataset.act;
+
+    if(act==='del'){
+      if(pendingDelId===r.id){
+        clearTimeout(pendingDelTimer);
+        pendingDelId=null;
+        moveToTrash(r.id);
+        selectedId='';
+        renderList(); renderTrash();
+        toast('已移到回收站，可在回收站恢复');
+      } else {
+        pendingDelId=r.id;
+        renderDetail(r);
+        clearTimeout(pendingDelTimer);
+        pendingDelTimer=setTimeout(function(){ pendingDelId=null; renderDetail(findRec(selectedId)); },4000);
+      }
+      return;
+    }
+    if(act==='use'){
+      if(isForeign(r)){ toast('这条由 '+r.owner+' 自己标'); return; }
+      const u=b.dataset.use;
+      r.use=(r.use===u)?null:u;
+      save(); renderDetail(r);
+      toast(r.use?('使用方式：'+USE_LABEL[r.use]):'已取消使用方式');
+      return;
+    }
+    if(act==='saveLater'){
+      const ta=detail.querySelector('textarea[data-act="laterInput"][data-id="'+r.id+'"]');
+      const v=ta?ta.value.trim():'';
+      if(!v){ toast('这一栏得你自己写几个字'); return; }
+      r.later=v; r.editedLater=true; save(); renderList(); renderDetail(findRec(r.id));
+      return;
+    }
+    if(act==='editLater'){
+      const q=detail.querySelector('.q.mine');
+      if(!q) return;
+      q.outerHTML='<div class="q mine"><em>如何处理 · 本人</em>'+
+        '<textarea rows="2" data-act="laterInput" data-id="'+esc(r.id)+'">'+esc(r.later)+'</textarea>'+
+        '<button class="vbtn" data-act="saveLater" data-id="'+esc(r.id)+'" type="button" style="margin-top:7px">存这一句</button></div>';
+      return;
+    }
+  });
+}
+/* ---------- 出附录 ---------- */
+function clip(s,n){
+  const t=String(s||'').replace(/\s+/g,' ').trim();
+  return t.length>n ? t.slice(0,n)+'…' : t;
+}
+
+function ownerStats(rows){
+  const m={}, order=[];
+  function bump(k,f){
+    if(!m[k]){ m[k]={n:0,later:0,slot:0,drop:0,todo:0}; order.push(k); }
+    m[k][f]++;
+  }
+  rows.forEach(r=>{
+    const k=r.owner||'未填名字';
+    bump(k,'n');
+    if(String(r.later||'').trim()) bump(k,'later');
+    if(r.editedSlot) bump(k,'slot');
+  });
+  return {map:m, order:order};
+}
+
+function imgCount(r){
+  if(Array.isArray(r.imgs)&&r.imgs.length) return r.imgs.length;
+  return r.img?1:0;
+}
+function imgNotes(r){
+  const list=Array.isArray(r.imgs)&&r.imgs.length?r.imgs:(r.img?[{src:r.img,note:r.imgNote||''}]:[]);
+  return list.map(function(it){ return String(it.note||'').trim(); }).filter(Boolean);
+}
+function respLine(){ return String((document.getElementById('fResp')||{}).value||'').trim(); }
+
+function buildAppendix(withFull){
+  const rows=db.slice();
+  const aiRows=rows.filter(r=>(r.type||'ai')==='ai');
+  const refRows=rows.filter(r=>r.type==='ref');
+  const origRows=rows.filter(r=>r.type==='orig');
+  const gaps=aiRows.filter(r=>needsLater(r)&&!String(r.later||'').trim());
+  const gapsMine=gaps.filter(r=>!isForeign(r));
+  const gapsFr=gaps.filter(isForeign);
+  const unslotted=aiRows.filter(r=>!r.slot);
+  const groups={};
+  ORDER.forEach(s=>groups[s]=[]);
+  aiRows.forEach(r=>{ if(r.slot&&groups[r.slot]) groups[r.slot].push(r); });
+  const multi=isMulti();
+  const st=ownerStats(rows);
+  const demoN=rows.filter(r=>r.demo).length;
+
+  const tools={};
+  rows.forEach(r=>{ tools[r.tool]=(tools[r.tool]||0)+1; });
+  const toolLine=Object.keys(tools).map(k=>k+'（'+tools[k]+' 条）').join('、');
+
+  let out='AI 使用情况说明\n\n';
+  out+='本次材料整理使用 '+Object.keys(tools).length+' 款工具：'+(toolLine||'（无）')+'。\n';
+  if(demoN){
+    out+='注意：下面 '+demoN+' 条带【示例】标记，是工具自带的演示数据（由本队真实对话整理而成，来源与模拟条件见项目文档「数据来源、模拟条件与原创性说明」一节），不作为本次项目的 AI 使用证据。\n';
+  }
+  if(multi){
+    out+='下面的记录由 '+st.order.length+' 名组员各自在自己设备上随手存下、并逐条点过确认：'+
+      st.order.map(k=>k+'（'+st.map[k].n+' 条）').join('、')+'。工具只做归类和搬运，不新增事实。\n';
+  }
+  out+='以下每一条都摘自当场存下的原始记录，涉及事实的部分原样引用，整理工具未做任何改写。\n';
+  out+='正文里的引文为节选（每条不超过 120 字，超出以「…」标出）。'+
+       (withFull?'完整原文见文末「原始记录全文」。':'完整原始记录共 '+rows.length+' 条，见附加材料《AI 使用记录》。')+'\n';
+
+  ORDER.forEach(s=>{
+    const list=groups[s];
+    out+='\n'+SLOT_LABEL[s]+'\n';
+    if(!list||!list.length){ out+='（本次没有归入这一栏的记录；不是漏写，是确实没发生过这类环节。）\n'; return; }
+    list.forEach((r,i)=>{
+      out+=(i+1)+'. ';
+      if(r.demo) out+='【示例】';
+      const keyed = r.key && (s==='关键 Prompt' ? r.key.mine : r.key.theirs);
+      const body = keyed || (s==='关键 Prompt' ? (r.myWords||r.aiResult||'') : (r.aiResult||r.myWords||''));
+      out+='「'+clip(body,120)+'」\n';
+      out+='    '+r.ts+' · '+r.tool+(multi?' · 记的人：'+(r.owner||'未填名字'):'')+(r.usedAt?(' · AI 使用：'+r.usedAt):'')+' · 我在干嘛：'+r.scene+' · 记录 '+r.id+'\n';
+      if(String(r.later||'').trim()) out+='    如何处理：'+r.later.replace(/\s+/g,' ')+'\n';
+      out+='    使用方式：'+(USE_LABEL[r.use]||'未标注')+'\n';
+      if(imgCount(r)) out+='    附截图 '+imgCount(r)+' 张（见材料附件）\n';
+      imgNotes(r).forEach(function(n){ out+='    图注：'+n+'\n'; });
+      if(r.link) out+='    原始对话链接：'+r.link+'\n';
+    });
+  });
+
+  out+='\n七、资料引用\n';
+  if(!refRows.length){ out+='（本次没有引用外部资料。）\n'; }
+  refRows.forEach(function(r,i){
+    out+=(i+1)+'. '+(r.refName||'（未写名称）')+'\n';
+    if(r.refSource) out+='    来源：'+r.refSource.replace(/\s+/g,' ')+'\n';
+    if(r.refUse) out+='    用于：'+r.refUse.replace(/\s+/g,' ')+'\n';
+    if(imgCount(r)) out+='    附截图 '+imgCount(r)+' 张（见材料附件）\n';
+    imgNotes(r).forEach(function(n){ out+='    图注：'+n+'\n'; });
+    out+='    '+r.ts+(multi?' · 记的人：'+(r.owner||'未填名字'):'')+' · 记录 '+r.id+'\n';
+  });
+
+  out+='\n八、原创内容与制作过程\n';
+  if(!origRows.length){ out+='（本次没有单列原创内容。）\n'; }
+  origRows.forEach(function(r,i){
+    out+=(i+1)+'. '+(r.origWhat||'（未写内容）')+'\n';
+    if(r.origTool) out+='    用的工具：'+r.origTool+'\n';
+    if(imgCount(r)) out+='    附截图 '+imgCount(r)+' 张（见材料附件）\n';
+    imgNotes(r).forEach(function(n){ out+='    图注：'+n+'\n'; });
+    out+='    '+r.ts+(multi?' · 记的人：'+(r.owner||'未填名字'):'')+' · 记录 '+r.id+'\n';
+  });
+
+  if(promiseOK){
+    out+='\n九、诚信声明\n';
+    out+='本人承诺：本作品中的 AI 使用情况与素材来源均已如实记录，未隐瞒、未虚构。\n';
+    out+='本人负责：'+(respLine()||'＿＿＿＿＿＿＿＿')+' 部分。\n';
+    out+='记录如上。\n';
+    out+='签名：'+(me||'＿＿＿＿')+'　日期：'+nowStr().slice(0,10)+'\n';
+  }
+
+  if(multi){
+    out+='\n【谁记了多少】\n';
+    st.order.forEach(k=>{
+      const o=st.map[k];
+      out+='· '+k+'：'+o.n+' 条，其中本人写了「如何处理」'+o.later+' 条、改过工具归类 '+o.slot+' 条。\n';
+    });
+  }
+
+  if(gaps.length){
+    out+='\n【需本人补充】\n';
+    gapsMine.forEach(r=>{ out+='· '+r.id+'「'+r.scene+'」选了改了一点/未采纳，但还没写怎么改的或为什么没用。\n'; });
+    gapsFr.forEach(r=>{ out+='· '+r.id+'「'+r.scene+'」由 '+esc1(r.owner)+' 记录，这一栏只能他本人补，整理人代写不了。\n'; });
+  }
+  if(unslotted.length){
+    out+='\n【还没归类】'+unslotted.map(r=>r.id).join('、')+' 是 AI 记录但没选环节，先回「记录」页归类再导出。\n';
+  }
+
+  if(withFull){
+    out+='\n【原始记录全文】（正文引文即节选自此，未做改写）\n';
+    rows.forEach(r=>{
+      const t=r.type||'ai';
+      out+='\n'+r.id+'　'+r.ts+'　['+TYPE_LABEL[t]+']　'+r.tool+'　'+(r.owner||'未填名字')+'　'+r.scene+'\n';
+      if(t==='ai'){
+        if(r.myWords) out+='  我问：'+r.myWords+'\n';
+        if(r.aiResult) out+='  它答：'+r.aiResult+'\n';
+        if(String(r.later||'').trim()) out+='  如何处理：'+r.later+'\n';
+      } else if(t==='ref'){
+        if(r.refName) out+='  资料：'+r.refName+'\n';
+        if(r.refSource) out+='  来源：'+r.refSource+'\n';
+        if(r.refUse) out+='  用于：'+r.refUse+'\n';
+      } else {
+        if(r.origWhat) out+='  做了什么：'+r.origWhat+'\n';
+        if(r.origTool) out+='  工具：'+r.origTool+'\n';
+      }
+      imgNotes(r).forEach(function(n){ out+='  图注：'+n+'\n'; });
+      if(r.link) out+='  链接：'+r.link+'\n';
+    });
+  } else {
+    out+='\n【完整原始记录】共 '+rows.length+' 条，见附加材料《AI 使用记录》（本工具可导出完整版）。\n';
+  }
+
+  const editedSlot=rows.filter(r=>r.editedSlot).length;
+  const wroteLater=rows.filter(r=>String(r.later||'').trim()).length;
+
+  const useCounts={direct:0,partial:0,rewrite:0};
+  aiRows.forEach(r=>{ if(r.use) useCounts[r.use]++; });
+  const useNone=aiRows.length-useCounts.direct-useCounts.partial-useCounts.rewrite;
+
+  out+='\n———\n';
+  out+='本附录由 '+(multi?st.order.length+' 名组员提供的 ':'')+rows.length+' 条记录生成'+
+       (demoN?('（其中带【示例】标记的演示数据 '+demoN+' 条）'):'')+'：其中 AI 记录 '+aiRows.length+' 条、资料 '+refRows.length+
+       ' 条、原创 '+origRows.length+' 条；改过工具归类 '+editedSlot+
+       ' 条、本人写了「如何处理」'+wroteLater+' 条。\n';
+  out+='使用方式分布：直接采用 '+useCounts.direct+' 条、改了一点 '+useCounts.partial+' 条、未采纳 '+useCounts.rewrite+' 条'+
+       (useNone?('、未标注 '+useNone+' 条'):'')+'。\n';
+  out+='记录人：'+(me||'＿＿＿＿')+(multi?'（本次材料整理人；各条由其记录人本人记录）':'')+'　导出时间：'+nowStr()+'\n';
+
+  return {text:out, rows:rows, aiRows:aiRows, refRows:refRows, origRows:origRows,
+          gaps:gaps.length, gapsMine:gapsMine.length, gapsFr:gapsFr.length,
+          unslotted:unslotted.length, total:db.length, multi:multi, demoN:demoN, owners:st,
+          editedSlot:editedSlot, wroteLater:wroteLater};
+}
+function esc1(s){ return String(s||'未填名字'); }
+
+function flashTo(id){
+  selectedId=id;
+  renderList();
+  const el=document.querySelector('.rcb[data-id="'+id+'"]');
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  setTimeout(function(){ el.classList.remove('flash'); },2400);
+}
+
+function guideToMissing(){
+  if(!me){
+    showView('record');
+    const mi=document.getElementById('fMe');
+    mi.scrollIntoView({behavior:'smooth',block:'center'});
+    mi.focus();
+    toast('先在「记录」页顶部填你的名字');
+    return false;
+  }
+  if(!respLine()){
+    document.getElementById('fResp').scrollIntoView({behavior:'smooth',block:'center'});
+    document.getElementById('fResp').focus();
+    toast('先写「本人负责哪部分」，诚信声明里要用');
+    return false;
+  }
+  if(!promiseOK){
+    const box=document.querySelector('.declarebox');
+    if(box) box.scrollIntoView({behavior:'smooth',block:'center'});
+    toast('最后确认那里勾上「本人承诺」，左边才会出现声明');
+    return false;
+  }
+  const noSlot=db.filter(r=>(r.type||'ai')==='ai'&&!r.slot);
+  if(noSlot.length){
+    showView('record'); flashTo(noSlot[0].id);
+    toast('这 '+noSlot.length+' 条 AI 记录还没选归类，先在列表里选一下');
+    return false;
+  }
+  const gaps=db.filter(r=>needsLater(r)&&!String(r.later||'').trim()&&!isForeign(r));
+  if(gaps.length){
+    showView('record'); setFilter('all'); flashTo(gaps[0].id);
+    toast('这 '+gaps.length+' 条选了改了一点/未采纳，补一句怎么处理的再导出');
+    return false;
+  }
+  return true;
+}
+
+function updateCopyGate(a){
+  const btn=document.getElementById('btnCopy');
+  const docBtn=document.getElementById('btnDoc');
+  const miss=[];
+  if(!me) miss.push('填你的名字');
+  if(!respLine()) miss.push('写「本人负责」');
+  if(!promiseOK) miss.push('勾选「本人承诺」');
+  if(a&&a.unslotted) miss.push('归类 '+a.unslotted+' 条');
+  if(a&&a.gapsMine) miss.push('补 '+a.gapsMine+' 条「如何处理」');
+  const blocked=!!miss.length;
+  btn.classList.toggle('blocked',blocked);
+  btn.textContent=blocked?('还不能复制 · 点这里去'+miss[0]):'复制全文';
+  btn.title=blocked?('还需要：'+miss.join('；')+'。点一下会带你过去。'):'可以复制';
+  docBtn.classList.toggle('blocked',blocked);
+  docBtn.textContent=blocked?'还不能导出 Word':'导出 Word（.doc）';
+}
+
+function renderExport(){
+  const paper=document.getElementById('paper');
+  document.getElementById('signEcho').textContent=me||'还没填';
+  const fixBtn=document.getElementById('btnFixSign');
+  if(fixBtn) fixBtn.hidden=!!me;
+  const pb=document.getElementById('fPromise');
+  if(pb) pb.checked=promiseOK;
+  if(!db.length){
+    paper.innerHTML='<h2>还没有可导出的内容</h2><p class="sub">先在「记录」页保存几条，这里会自动排成说明。</p>';
+    updateCopyGate(null);
+    return;
+  }
+  const a=buildAppendix(includeFull);
+  updateCopyGate(a);
+  let h='<h2>AI 使用情况说明</h2><p class="sub">每一条都摘自当场存下的原始记录，涉及事实的部分原样引用，工具未做任何改写。</p>';
+  h+='<h3>一、AI 工具使用</h3>';
+  const tools={}; a.rows.forEach(r=>{ tools[r.tool]=(tools[r.tool]||0)+1; });
+  h+='<div class="item">本次使用 '+Object.keys(tools).length+' 款工具：'+
+     Object.keys(tools).map(k=>esc(k)+'（'+tools[k]+' 条）').join('、')+'。</div>';
+  if(a.demoN){
+    h+='<div class="item" style="color:var(--warn)">注意：下面有 <b>'+a.demoN+'</b> 条带【示例】标记，是工具自带的演示数据（由本队真实对话整理），不作为本次项目的 AI 使用证据；来源与模拟条件写进项目文档第十节。</div>';
+  }
+  if(a.multi){
+    h+='<div class="item">'+esc(a.owners.order.length)+' 名组员各自在自己设备上随手存下：'+
+       a.owners.order.map(k=>esc(k)+'（'+a.owners.map[k].n+' 条）').join('、')+'。</div>';
+  }
+
+  ORDER.forEach(s=>{
+    const list=a.aiRows.filter(r=>r.slot===s);
+    h+='<h3>'+esc(SLOT_LABEL[s])+'<span class="cnt">'+(list.length?list.length+' 条':'本栏无记录')+'</span></h3>';
+    if(!list.length){
+      h+='<div class="item" style="color:var(--ink3)">（本次没有归入这一栏的记录；不是漏写，是确实没发生过这类环节。）</div>';
+      return;
+    }
+    list.forEach(r=>{
+      const keyed=r.key&&(s==='关键 Prompt'?r.key.mine:r.key.theirs);
+      const body=keyed||(s==='关键 Prompt'?(r.myWords||r.aiResult):(r.aiResult||r.myWords))||'';
+      h+='<div class="item"><span class="ref">'+esc(r.id)+'</span>'+
+         (r.demo?'<span class="ref demo">示例</span>':'')+
+         (a.multi?'<span class="ref own">'+esc(r.owner||'未填名字')+'</span>':'')+
+         '<span class="quote">「'+esc(clip(body,120))+'」</span>'+
+         '<span class="ref" style="background:transparent;padding-left:0">'+esc(r.ts)+' · '+esc(r.tool)+' · '+esc(r.scene)+(r.usedAt?' · AI 使用：'+esc(r.usedAt):'')+
+         (r.use?' · 使用方式：'+esc(USE_LABEL[r.use]):' · 使用方式：未标注')+'</span></div>';
+      if(String(r.later||'').trim()){
+        h+='<div class="item" style="padding-left:14px"><span class="quote" style="border-left-color:var(--brand)">'+esc(r.later)+'</span></div>';
+      }
+      if(imgCount(r)){
+        h+='<div class="item" style="padding-left:14px;color:var(--ink3);font-size:13px">附截图 '+imgCount(r)+' 张'+
+           (imgNotes(r).length?('　图注：'+imgNotes(r).map(esc).join('；')):'')+'</div>';
+      }
+    });
+  });
+
+  /* 七、资料引用 */
+  h+='<h3>七、资料引用<span class="cnt">'+(a.refRows.length?a.refRows.length+' 条':'本次无')+'</span></h3>';
+  if(!a.refRows.length){
+    h+='<div class="item" style="color:var(--ink3)">（本次没有引用外部资料。）</div>';
+  }
+  a.refRows.forEach((r,i)=>{
+    h+='<div class="item"><span class="ref">'+esc(r.id)+'</span><span class="ref type-ref">资料</span>'+
+       (a.multi?'<span class="ref own">'+esc(r.owner||'未填名字')+'</span>':'')+
+       '<b>'+esc(r.refName||'（未写名称）')+'</b></div>';
+    if(r.refSource) h+='<div class="item" style="padding-left:14px;color:var(--ink2)">来源：'+esc(r.refSource)+'</div>';
+    if(r.refUse) h+='<div class="item" style="padding-left:14px;color:var(--ink2)">用于：'+esc(r.refUse)+'</div>';
+    if(imgCount(r)) h+='<div class="item" style="padding-left:14px;color:var(--ink3);font-size:13px">附截图 '+imgCount(r)+' 张'+(imgNotes(r).length?('　图注：'+imgNotes(r).map(esc).join('；')):'')+'</div>';
+  });
+
+  /* 八、原创内容 */
+  h+='<h3>八、原创内容与制作过程<span class="cnt">'+(a.origRows.length?a.origRows.length+' 条':'本次无')+'</span></h3>';
+  if(!a.origRows.length){
+    h+='<div class="item" style="color:var(--ink3)">（本次没有单列原创内容。）</div>';
+  }
+  a.origRows.forEach(r=>{
+    h+='<div class="item"><span class="ref">'+esc(r.id)+'</span><span class="ref type-orig">原创</span>'+
+       (a.multi?'<span class="ref own">'+esc(r.owner||'未填名字')+'</span>':'')+
+       '<span class="quote" style="border-left-color:var(--ink2)">'+esc(r.origWhat||'（未写内容）')+'</span>'+
+       (r.origTool?'<span class="ref" style="background:transparent;padding-left:0">'+esc(r.origTool)+'</span>':'')+'</div>';
+    if(imgCount(r)) h+='<div class="item" style="padding-left:14px;color:var(--ink3);font-size:13px">附截图 '+imgCount(r)+' 张'+(imgNotes(r).length?('　图注：'+imgNotes(r).map(esc).join('；')):'')+'</div>';
+  });
+
+  /* 九、诚信声明（勾选后才出现） */
+  if(promiseOK){
+    h+='<h3>九、诚信声明</h3>'+
+       '<div class="item">本人承诺：本作品中的 AI 使用情况与素材来源均已如实记录，未隐瞒、未虚构。</div>'+
+       '<div class="item">本人负责：<b>'+esc(respLine()||'＿＿＿＿＿＿＿＿')+'</b> 部分。</div>'+
+       '<div class="item">记录如上。</div>'+
+       '<div class="item">签名：'+esc(me||'＿＿＿＿')+'　日期：'+nowStr().slice(0,10)+'</div>';
+  }
+
+  if(a.multi){
+    h+='<h3>谁记了多少<span class="cnt">合并后每人各占多少</span></h3>';
+    a.owners.order.forEach(k=>{
+      const o=a.owners.map[k];
+      h+='<div class="item"><span class="ref own">'+esc(k)+'</span>进附录 <b>'+o.n+'</b> 条，其中本人写了「如何处理」<b>'+o.later+
+         '</b> 条、改过工具归类 <b>'+o.slot+'</b> 条。</div>';
+    });
+  }
+
+  if(a.gaps){
+    h+='<div class="gapline">【需本人补充】有 '+a.gaps+' 条选了改了一点/未采纳，但还没写怎么改的或为什么没用。'+
+       (a.gapsMine?('其中 '+a.gapsMine+' 条是你的，补齐后再导出一次。'):'')+'</div>';
+  }
+  if(a.unslotted){
+    h+='<div class="gapline">有 '+a.unslotted+' 条 AI 记录已经确认但还没选环节，所以上面六栏里没有它们。回「记录」页归好类再导出。</div>';
+  }
+  if(includeFull){
+    h+='<h3>原始记录全文<span class="cnt">正文引文即节选自此，未改写</span></h3>'+
+       '<details class="fulltext"><summary>展开 · 共 '+a.rows.length+' 条完整原文</summary>';
+    a.rows.forEach(r=>{
+      const t=r.type||'ai';
+      h+='<div class="item" style="margin-top:12px"><span class="ref">'+esc(r.id)+'</span><span class="ref type-'+t+'">'+esc(TYPE_LABEL[t])+'</span> '+
+         esc(r.ts)+' · '+esc(r.tool)+(r.owner?' · '+esc(r.owner):'')+' · '+esc(r.scene)+(r.usedAt?' · AI 使用：'+esc(r.usedAt):'')+
+         (t==='ai'?(r.myWords?'<span class="quote">我问：'+esc(r.myWords)+'</span>':'')+(r.aiResult?'<span class="quote">它答：'+esc(r.aiResult)+'</span>':'')+(String(r.later||'').trim()?'<span class="quote" style="border-left-color:var(--brand)">如何处理：'+esc(r.later)+'</span>':''):'')+
+         (t==='ref'?(r.refName?'<span class="quote">资料：'+esc(r.refName)+'</span>':'')+(r.refSource?'<span class="quote">来源：'+esc(r.refSource)+'</span>':'')+(r.refUse?'<span class="quote">用于：'+esc(r.refUse)+'</span>':''):'')+
+         (t==='orig'?(r.origWhat?'<span class="quote">做了什么：'+esc(r.origWhat)+'</span>':'')+(r.origTool?'<span class="quote">工具：'+esc(r.origTool)+'</span>':''):'')+
+         (imgNotes(r).length?'<span class="quote">图注：'+esc(imgNotes(r).join('；'))+'</span>':'')+
+         (r.link?'<span class="thumblink">链接：'+esc(r.link)+'</span>':'')+
+         '</div>';
+    });
+    h+='</details>';
+  } else {
+    h+='<div class="item" style="color:var(--sub)">完整原始记录共 <b>'+a.rows.length+'</b> 条，见附加材料《AI 使用记录》。勾选下面的选项可以连全文一起导出。</div>';
+  }
+
+  const uc={direct:0,partial:0,rewrite:0};
+  a.aiRows.forEach(r=>{ if(r.use) uc[r.use]++; });
+  const ucNone=a.aiRows.length-uc.direct-uc.partial-uc.rewrite;
+  h+='<div class="stats">本附录由 '+(a.multi?esc(a.owners.order.length)+' 名组员提供的 ':'')+'<b>'+a.rows.length+
+     '</b> 条记录生成'+(a.demoN?('（其中带【示例】标记的演示数据 <b>'+a.demoN+'</b> 条）'):'')+'：AI '+a.aiRows.length+' 条、资料 '+a.refRows.length+
+     ' 条、原创 '+a.origRows.length+' 条；修改过工具归类 <b>'+a.editedSlot+
+     '</b> 条、本人写了「如何处理」<b>'+a.wroteLater+'</b> 条。'+
+     '<br>使用方式分布：直接采用 <b>'+uc.direct+'</b> 条、改了一点 <b>'+uc.partial+'</b> 条、未采纳 <b>'+uc.rewrite+'</b> 条'+
+     (ucNone?('、未标注 <b>'+ucNone+'</b> 条'):'')+'。'+
+     '<br>记录人：<b>'+esc(me||'＿＿＿＿')+'</b>'+(a.multi?'（本次材料整理人；各条由其记录人本人记录）':'')+'　导出时间：'+nowStr()+'</div>';
+  paper.innerHTML=h;
+}
+
+function bindExport(){
+  document.getElementById('btnCopy').addEventListener('click',()=>{
+    if(!guideToMissing()) return;
+    copy(buildAppendix(includeFull).text);
+  });
+  /* 诚信声明/素材一改，预览和门槛立刻跟着变 */
+  ['fResp'].forEach(function(id){
+    document.getElementById(id).addEventListener('input',function(){
+      if(document.getElementById('v-export').classList.contains('on')) renderExport();
+    });
+  });
+  const promiseBox=document.getElementById('fPromise');
+  if(promiseBox) promiseBox.addEventListener('change',function(){
+    promiseOK=promiseBox.checked; renderExport();
+  });
+  const ff=document.getElementById('fFull');
+  ff.checked=includeFull;
+  ff.addEventListener('change',()=>{ includeFull=ff.checked; renderExport(); });
+  document.getElementById('btnDemo').addEventListener('click',()=>{
+    let added=0;
+    window.SEED.forEach(s=>{ if(!findRec(s.id)){ const c=JSON.parse(JSON.stringify(s)); c.owner=me; db.push(c); added++; } });
+    db.sort((x,y)=>x.ts<y.ts?1:-1);
+    save(); renderExport();
+    toast(added?('载入 '+added+' 条示例记录'+(me?('，都记在 '+me+' 名下'):'，你还没填名字')):'示例已经在了');
+  });
+  document.getElementById('btnFixSign').addEventListener('click',()=>{
+    showView('record');
+    const mi=document.getElementById('fMe');
+    mi.scrollIntoView({behavior:'smooth',block:'center'});
+    mi.focus();
+    toast('名字只在「记录」页顶部填一次');
+  });
+  document.getElementById('importBox').addEventListener('click',e=>{
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    if(b.dataset.act==='doImport') commitImport();
+    if(b.dataset.act==='closeImport'){ pendingImport=null; renderImportPanel(); }
+  });
+  document.getElementById('btnExportJson').addEventListener('click',exportJson);
+  document.getElementById('btnDoc').addEventListener('click',exportDoc);
+  document.getElementById('btnImportJson').addEventListener('click',()=>document.getElementById('fJson').click());
+  document.getElementById('fJson').addEventListener('change',e=>{
+    const f=e.target.files&&e.target.files[0];
+    if(!f) return;
+    const fr=new FileReader();
+    fr.onload=()=>{ ingestJson(String(fr.result), f.name); e.target.value=''; };
+    fr.onerror=()=>importFail('这个文件读不出来，换一个试试');
+    fr.readAsText(f,'utf-8');
+  });
+}
+
+/* ---------- 多人记录合并（队里几人就几台设备） ---------- */
+function safeName(s){
+  const t=String(s||'').replace(/[\\/:*?"<>|\s]/g,'');
+  return t||'未命名';
+}
+function dateTag(){
+  const d=new Date();
+  return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+}
+function download(name,mime,text){
+  try{
+    const blob=new Blob([text],{type:mime+';charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },600);
+    return true;
+  }catch(e){ return false; }
+}
+
+function exportJson(){
+  if(!db.length){ toast('还没有记录可导出'); return; }
+  if(!me){
+    showView('record');
+    const mi=document.getElementById('fMe'); mi.scrollIntoView({block:'center'}); mi.focus();
+    toast('导出前先填名字，队友合并时靠它认人');
+    return;
+  }
+  const payload={app:'过程留痕',ver:1,owner:me,exportedAt:nowStr(),count:db.length,records:db};
+  const text=JSON.stringify(payload,null,1);
+  const name='过程留痕-'+safeName(me)+'-'+dateTag()+'.json';
+  if(!download(name,'application/json',text)){ toast('这台浏览器不让脚本下载文件，手动把「导出」页的文字全选发给队友也行'); return; }
+  const mb=text.length/1048576;
+  const el=document.getElementById('expHint');
+  el.textContent='已导出 '+db.length+' 条 → '+name+(mb>2?('（带截图约 '+mb.toFixed(1)+' MB，微信传不动，用 QQ 或网盘）'):'');
+  setTimeout(function(){ el.textContent=''; },5200);
+  toast('把 '+name+' 发给队友，让他点「导入队友的记录」');
+}
+
+function normImport(r,fileOwner){
+  const out={
+    id:String(r.id||''),
+    ts:String(r.ts||''),
+    tool:String(r.tool||''),
+    owner:String(r.owner||fileOwner||''),
+    type:['ai','ref','orig'].indexOf(r.type)>=0?r.type:'ai',
+    scene:String(r.scene||''),
+    myWords:String(r.myWords||''),
+    aiResult:String(r.aiResult||''),
+    refName:String(r.refName||''),
+    refSource:String(r.refSource||''),
+    refUse:String(r.refUse||''),
+    origWhat:String(r.origWhat||''),
+    origTool:String(r.origTool||''),
+    later:String(r.later||''),
+    img:typeof r.img==='string'?r.img:'',
+    imgNote:String(r.imgNote||''),
+    imgs:Array.isArray(r.imgs)?r.imgs.filter(function(x){return x&&typeof x.src==='string';}).map(function(x){
+      return {src:x.src, note:String(x.note||'')};
+    }):[],
+    link:String(r.link||''),
+    use:['direct','partial','rewrite'].indexOf(r.use)>=0?r.use:null,
+    verdict:r.verdict==='disagree'?'disagree':(r.verdict==='agree'?'agree':null),
+    slot:SLOTS.indexOf(r.slot)>=0?r.slot:null,
+    editedSlot:!!r.editedSlot,
+    editedLater:!!r.editedLater,
+    dropReason:String(r.dropReason||''),
+    demo:!!r.demo,
+    inp:true,
+    sid:String(r.id||'')
+  };
+  if(!out.ts) out.ts=nowStr();
+  if(out.type==='ai'&&!out.slot) out.slot=classify(out);
+  return out;
+}
+
+function ingestJson(text,name){
+  let data;
+  try{ data=JSON.parse(text); }
+  catch(e){ importFail('「'+name+'」不是这个工具导出的 JSON，解析就失败了'); return; }
+  const list=Array.isArray(data)?data:(data&&Array.isArray(data.records)?data.records:null);
+  if(!list){ importFail('「'+name+'」里找不到记录数组，只认「导出我的记录」生成的文件'); return; }
+  const fileOwner=(!Array.isArray(data)&&data.owner)?String(data.owner):'';
+  const usable=list.filter(r=>r&&typeof r==='object'&&
+    (String(r.scene||'').trim()||String(r.myWords||'').trim()||String(r.aiResult||'').trim()||
+     String(r.refName||'').trim()||String(r.origWhat||'').trim()));
+  const junk=list.length-usable.length;
+  const seen={};
+  db.forEach(r=>{ seen[fpOf(r)]=1; });
+  const rows=[]; let dup=0;
+  usable.forEach(r=>{
+    const rec=normImport(r,fileOwner);
+    if(seen[fpOf(rec)]){ dup++; return; }
+    seen[fpOf(rec)]=1; rows.push(rec);
+  });
+  pendingImport={owner:fileOwner||'（文件里没写名字）',exportedAt:(data&&data.exportedAt)||'',
+                 rows:rows,fileCount:usable.length,dup:dup,junk:junk,name:name};
+  renderImportPanel();
+  document.getElementById('importBox').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function importFail(msg){
+  const box=document.getElementById('importBox');
+  box.hidden=false;
+  box.className='importbox bad';
+  box.innerHTML='<em>没能读进来</em><span>'+esc(msg)+'</span>'+
+    '<div class="actions"><button class="btn tiny" type="button" data-act="closeImport">关掉</button></div>';
+  pendingImport=null;
+}
+
+function renderImportPanel(){
+  const box=document.getElementById('importBox');
+  if(!pendingImport){ box.hidden=true; box.innerHTML=''; box.className='importbox'; return; }
+  const p=pendingImport;
+  let h='<em>先看清再并入 · 这份是 '+esc(p.owner)+' 导出的'+(p.exportedAt?'（'+esc(p.exportedAt)+'）':'')+'</em>';
+
+  if(!p.rows.length){
+    h+='<p class="impsure">这份文件里的 <b>'+p.dup+'</b> 条，和你库里已有的一模一样（同一个人、同一时间、同一句「我在干嘛」），'+
+       '说明你已经导入过一次了。<b>不用并第二遍</b>，并两遍会让附录里的条数虚高。</p>'+
+       '<div class="actions"><button class="btn" type="button" data-act="closeImport">关掉</button></div>';
+    box.className='importbox'; box.innerHTML=h; box.hidden=false; return;
+  }
+
+  const aiN=p.rows.filter(r=>(r.type||'ai')==='ai').length;
+  const refN=p.rows.filter(r=>r.type==='ref').length;
+  const origN=p.rows.filter(r=>r.type==='orig').length;
+  const miss=p.rows.filter(r=>needsLater(r)&&!String(r.later||'').trim()).length;
+  const mine=p.rows.filter(r=>(r.owner||'')===me).length;
+
+  h+='<ul>';
+  h+='<li>文件里共 <b>'+(p.rows.length+p.dup+p.junk)+'</b> 条。重复跳过 <b>'+p.dup+'</b> 条'+
+      (p.junk?('，空内容忽略 '+p.junk+' 条'):'')+'，准备并入 <b>'+p.rows.length+'</b> 条。</li>';
+  h+='<li>其中 AI <b>'+aiN+'</b> 条、资料 <b>'+refN+'</b> 条、原创 <b>'+origN+'</b> 条。</li>';
+  if(miss){
+    h+='<li>其中缺「如何处理」<b>'+miss+'</b> 条：并入后这一栏在你这里是灰的，只能他回自己设备上补，补完再导出一次给你。</li>';
+  }
+  h+='<li>每条都打上 '+esc(p.owner)+'，编号会重排以免和你现在的记录撞号'+(mine?('，其中有 '+mine+' 条名字和你相同'):'')+'。</li>';
+  h+='</ul>';
+  h+='<p class="impsure">并入之后你可以看他记录的内容，但<b>不能替他写「如何处理」</b>——别人替他写的痕迹，老师一眼就能问出来。</p>';
+  h+='<div class="actions">'+
+     '<button class="btn primary" type="button" data-act="doImport">确认并入 '+p.rows.length+' 条</button>'+
+     '<button class="btn" type="button" data-act="closeImport">取消</button></div>';
+  box.className='importbox';
+  box.innerHTML=h;
+  box.hidden=false;
+}
+
+function commitImport(){
+  if(!pendingImport) return;
+  const rows=pendingImport.rows;
+  rows.forEach(r=>{ r.id=nextId(); db.unshift(r); });
+  const dup=pendingImport.dup, who=pendingImport.owner;
+  db.sort((x,y)=>x.ts<y.ts?1:-1);
+  save();
+  pendingImport=null;
+  renderImportPanel();
+  showView('record'); setFilter('all');
+  toast('已并入 '+rows.length+' 条（'+who+'），跳过重复 '+dup+' 条');
+}
+
+function exportDoc(){
+  if(!guideToMissing()) return;
+  const a=buildAppendix(includeFull);
+  const name='AI使用情况说明-'+safeName(me)+'-'+dateTag()+'.doc';
+  if(!download(name,'application/msword',docHtml(a.text))){ toast('这台浏览器不让脚本下载文件，用「复制全文」贴进 Word'); return; }
+  const el=document.getElementById('expHint');
+  el.textContent='已导出 '+name+'，内容和上面这份文字一字不差';
+  setTimeout(function(){ el.textContent=''; },4200);
+}
+
+function docHtml(text){
+  const lines=String(text).replace(/\r/g,'').split('\n');
+  let body='';
+  lines.forEach(function(raw){
+    const s=raw.trim();
+    if(!s) return;
+    const t=esc(s);
+    if(s==='AI 使用情况说明') body+='<h1>'+t+'</h1>';
+    else if(/^[一二三四五六]、/.test(s)) body+='<h2>'+t+'</h2>';
+    else if(/^【/.test(s)) body+='<h3>'+t+'</h3>';
+    else if(/^———$/.test(s)) body+='<hr>';
+    else if(/^\d+\./.test(s)) body+='<p class="n">'+t+'</p>';
+    else if(/^·/.test(s)) body+='<p class="b">'+t+'</p>';
+    else if(/^\s{2,}/.test(raw)||s.indexOf('·')>0&&raw.charAt(0)===' ') body+='<p class="i">'+t+'</p>';
+    else body+='<p>'+t+'</p>';
+  });
+  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" '+
+   'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>AI 使用情况说明</title><style>'+
+   '@page{size:A4;margin:2cm 2.2cm}'+
+   'body{font-family:宋体,SimSun,serif;font-size:12pt;line-height:1.75;color:#000}'+
+   'h1{font-family:黑体,SimHei;font-size:17pt;text-align:center;margin:0 0 16pt;font-weight:bold}'+
+   'h2{font-family:黑体,SimHei;font-size:13pt;margin:16pt 0 5pt;font-weight:bold}'+
+   'h3{font-family:黑体,SimHei;font-size:12pt;margin:13pt 0 4pt;font-weight:bold;color:#7a4a18}'+
+   'p{margin:0 0 6pt;word-break:break-word}'+
+   'p.n{margin:0 0 2pt}'+
+   'p.i{margin:0 0 8pt 24pt;color:#222}'+
+   'p.b{margin:0 0 4pt 12pt}'+
+   'hr{border:0;border-top:1px solid #888;margin:13pt 0}'+
+   '</style></head><body>'+body+'</body></html>';
+}
+
+function copy(text){
+  const hintEl=document.getElementById('expHint');
+  function done(){
+    const btn=document.getElementById('btnCopy');
+    btn.classList.add('ok');
+    setTimeout(function(){ btn.classList.remove('ok'); },1600);
+    hintEl.textContent='已复制，直接粘进 Word';
+    setTimeout(function(){ hintEl.textContent=''; },3000);
+  }
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done,fallback);
+  } else fallback();
+  function fallback(){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，长按文本框手动复制'); }
+    document.body.removeChild(ta);
+  }
+}
+
+/* ---------- 提示条 ---------- */
+let timer=null;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.hidden=false;
+  clearTimeout(timer); timer=setTimeout(()=>el.hidden=true,2600);
+}
+
+/* ---------- 引导音效：Web Audio 现场合成，不引外部音频文件 ---------- */
+let actx=null, soundOn=true;
+try{ soundOn=localStorage.getItem('liuhen-sound')!=='0'; }catch(e){}
+
+function audioCtx(){
+  if(!soundOn) return null;
+  try{
+    if(!actx){
+      const C=window.AudioContext||window.webkitAudioContext;
+      if(!C) return null;
+      actx=new C();
+    }
+    if(actx.state==='suspended') actx.resume();
+    return actx;
+  }catch(e){ return null; }
+}
+
+function tone(freq,dur,vol,delay){
+  const c=audioCtx(); if(!c) return;
+  try{
+    const t=c.currentTime+(delay||0);
+    const o=c.createOscillator(), g=c.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t+dur+0.04);
+  }catch(e){}
+}
+
+/* 短促噪声：鼠标“咔”、键盘“嗒”靠它，比纯正弦像真的 */
+function noiseBurst(dur,vol,delay,freq){
+  const c=audioCtx(); if(!c) return;
+  try{
+    const t=c.currentTime+(delay||0);
+    const n=Math.max(1,Math.floor(c.sampleRate*dur));
+    const buf=c.createBuffer(1,n,c.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<n;i++){ const k=1-i/n; d[i]=(Math.random()*2-1)*k*k; }
+    const src=c.createBufferSource(); src.buffer=buf;
+    const bp=c.createBiquadFilter();
+    bp.type='bandpass'; bp.frequency.value=freq||2000; bp.Q.value=.9;
+    const g=c.createGain(); g.gain.value=vol||0.06;
+    src.connect(bp); bp.connect(g); g.connect(c.destination);
+    src.start(t);
+  }catch(e){}
+}
+
+const SFX={
+  open:function(){ tone(523,0.13,0.05,0); tone(784,0.18,0.05,0.1); },
+  step:function(){ tone(620,0.09,0.04,0); },
+  done:function(){ tone(523,0.13,0.05,0); tone(659,0.13,0.05,0.1); tone(784,0.22,0.05,0.2); },
+  off:function(){ tone(320,0.1,0.04,0); },
+  click:function(){ noiseBurst(0.05,0.1,0,2400); tone(1500,0.03,0.025,0); },
+  key:function(){ noiseBurst(0.028,0.05,0,1500); },
+  ding:function(){ tone(880,0.12,0.04,0); tone(1175,0.16,0.035,0.09); }
+};
+
+function syncMute(){
+  const b=document.getElementById('coachMute');
+  if(b) b.classList.toggle('off',!soundOn);
+}
+
+/* 按动画节奏排音效：周期 2.9s 与 CSS 动画一致，播两轮就停 */
+let coachAudioTimer=null, coachAudioQueue=[];
+function stopCoachAudio(){
+  if(coachAudioTimer){ clearInterval(coachAudioTimer); coachAudioTimer=null; }
+  coachAudioQueue.forEach(clearTimeout); coachAudioQueue=[];
+}
+function coachAudioFor(i){
+  stopCoachAudio();
+  const kind=COACH_SFX[i];
+  if(!kind||!soundOn||!coachOn) return;
+  const CYCLE=2900;
+  let rounds=0;
+  function que(d,fn){ coachAudioQueue.push(setTimeout(fn,d)); }
+  function once(){
+    if(!coachOn||rounds>=2){ stopCoachAudio(); return; }
+    rounds++;
+    if(kind==='type'){
+      que(CYCLE*0.47,SFX.click);
+      que(CYCLE*0.52,SFX.key);
+      que(CYCLE*0.60,SFX.key);
+    } else if(kind==='typeonly'){
+      for(let k=0;k<8;k++) que(340+k*95,SFX.key);
+    } else if(kind==='typeclick'){
+      for(let k=0;k<8;k++) que(340+k*95,SFX.key);
+      que(1500,SFX.click);
+    } else if(kind==='click'){
+      que(CYCLE*0.47,SFX.click);
+    } else if(kind==='clickding'){
+      que(CYCLE*0.47,SFX.click);
+      que(CYCLE*0.64,SFX.ding);
+    } else if(kind==='clickfile'){
+      que(CYCLE*0.47,SFX.click);
+      que(CYCLE*0.58,SFX.ding);
+    }
+  }
+  once();
+  coachAudioTimer=setInterval(once,CYCLE);
+}
+
+/* ---------- 新手引导：屏幕正中的教程卡，每步一段小动画 ---------- */
+const COACH_KEY='liuhen-coach-v1';
+const FIG_CURSOR='<svg class="f-cursor" viewBox="0 0 20 24"><path d="M3 2 L3 19 L7.4 14.8 L10.2 21.4 L13 20.2 L10.2 13.8 L16.4 13.8 Z"/></svg><i class="f-click"></i>';
+function figHit(cls,inner){
+  return '<div class="f-anchor"><div class="'+cls+'">'+inner+'</div>'+FIG_CURSOR+'</div>';
+}
+const COACH_STEPS=[
+  {title:'这是你的 AI 使用账本',
+   text:'用一次 AI 就记一条。交材料时，工具把存下来的原话排成能交给老师的附录。<b>不联网，记录只留在这台电脑的浏览器里。</b>',
+   next:'开始看',
+   fig:'<div class="figrow"><div class="f-stack"><i></i><i></i><i></i></div><div class="f-arrow">→</div><div class="f-doc"><b></b><b></b><b></b><b></b></div></div>'},
+  {title:'填你的名字（必填）',
+   text:'每条记录都会带着这个名字，几个人各自记、最后合并时靠它分人。<b>名字不填，「保存这一条」不会亮。</b>',
+   fig:'<div class="figcol"><div class="f-field"><span class="f-cap">你的名字</span>'+figHit('f-in','<span class="f-type" style="--w:2.1em;animation-delay:1.5s">张三</span><i class="f-caret"></i>')+'</div></div>'},
+  {title:'选类型，把内容填进去',
+   text:'先选 <b>AI / 资料 / 原创</b>；用的工具和归类也在这里自己选。AI 要把<b>「我问的话」和「AI 回的话」都贴上</b>，资料填名称和来源，原创写做了什么。',
+   fig:'<div class="figcol"><div class="f-types cycle"><span class="on">AI</span><span>资料</span><span>原创</span></div><div class="f-fields"><div class="f-fg fg-a"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">DeepSeek</span></div><div class="f-in tiny"><span class="f-drop">归类：迭代优化</span></div></div><div class="f-row"><span class="f-tag">我问</span><div class="f-in tall"><span class="f-drop" style="--d:.2s">帮我把首页的锁屏页改成盖在首页上…</span></div></div><div class="f-row"><span class="f-tag">它回</span><div class="f-in tall"><span class="f-drop" style="--d:.6s">给你覆盖层结构，注意 z-index 要压过导航…</span></div></div></div><div class="f-fg fg-r"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">豆包</span></div><div class="f-in tiny faint"><span class="f-drop">资料不用归类</span></div></div><div class="f-row"><span class="f-tag">名称</span><div class="f-in tall"><span class="f-drop">归并排序 · 维基百科</span></div></div><div class="f-row"><span class="f-tag">来源</span><div class="f-in tall"><span class="f-drop">en.wikipedia.org 稳定排序一节</span></div></div></div><div class="f-fg fg-o"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">Figma</span></div><div class="f-in tiny faint"><span class="f-drop">原创不用归类</span></div></div><div class="f-row"><span class="f-tag">做了什么</span><div class="f-in tall"><span class="f-drop">自己画了系统流程图</span></div></div><div class="f-row"><span class="f-tag">工具</span><div class="f-in tall"><span class="f-drop">Figma</span></div></div></div></div></div>'},
+  {title:'选采纳、写处理，再保存',
+   text:'<b>只有 AI 记录有这一步</b>：直接采用不用写；改了一点写<b>怎么改的</b>；未采纳写<b>为什么没用</b>。必填项全齐，旁边的「保存这一条」才会亮起来。资料和原创填完内容直接保存。',
+   fig:'<div class="figcol"><div class="f-types cycle"><span>直接采用</span><span class="on">改了一点</span><span>未采纳</span></div><div class="f-in later"><span class="f-type s8" style="--w:8.2em">太生硬，改成淡入</span><i class="f-caret"></i></div>'+figHit('f-btn','保存这一条')+'</div>'},
+  {title:'点开一条看详情，再点一下收起',
+   text:'左边是已保存的记录，只显示时间、类型、工具和一句话标题。<b>点哪条，右边滑出它的完整内容；再点一下收起。</b>归类在卡片头部就能改。',
+   fig:'<div class="figcol"><div class="f-split"><div class="f-minis cycle"><i></i><i class="on"></i><i></i></div><div class="f-panel"><b></b><b></b><b></b><b></b></div></div><div class="f-cap" style="text-align:center">点左边一条 → 右边看详情</div></div>'},
+  {title:'在「导出」页出附录',
+   text:'先填「本人负责哪部分」，再到<b>「最后确认」</b>勾上「本人承诺」——左边末尾才会出现诚信声明。然后复制全文或导出 Word；几个人各导出记录，再由一个人导入合并。',
+   next:'开始记第一条',
+   fig:'<div class="figcol">'+figHit('f-btn','导出 Word')+'<div class="f-doc big"><b></b><b></b><b></b><b></b></div><div class="f-file">AI 使用说明.doc</div></div>'}
+];
+
+let coachIdx=-1, coachOn=false;
+
+/* 每一步配什么音效：null=没有可点的动作 */
+const COACH_SFX=[null,'type',null,'typeclick','clickding','clickfile'];
+
+function coachGo(i){
+  if(!coachOn) return;
+  if(i<0||i>=COACH_STEPS.length){ coachEnd(); return; }
+  const st=COACH_STEPS[i];
+  coachIdx=i;
+  if(i>0) SFX.step();
+  document.getElementById('coachFig').innerHTML=st.fig;
+  document.getElementById('coachStep').textContent='第 '+(i+1)+' 步，共 '+COACH_STEPS.length+' 步';
+  const dots=document.getElementById('coachDots');
+  if(dots) dots.innerHTML=COACH_STEPS.map(function(_,k){
+    return '<i class="'+(k===i?'on':'')+(k<i?' done':'')+'"></i>';
+  }).join('');
+  document.getElementById('coachTitle').textContent=st.title;
+  document.getElementById('coachText').innerHTML=st.text;
+  const prev=document.getElementById('coachPrev');
+  prev.disabled=(i===0);
+  prev.style.display=(i===0?'none':'');
+  document.getElementById('coachNext').textContent=st.next||(i===COACH_STEPS.length-1?'开始记第一条':'下一步');
+  document.getElementById('coachSkip').textContent=(i===0?'先跳过':'跳过');
+  coachAudioFor(i);
+}
+
+function coachStart(){
+  if(coachOn) return;
+  coachOn=true;
+  const layer=document.getElementById('coach');
+  if(!layer) return;
+  layer.hidden=false;
+  syncMute();
+  SFX.open();
+  coachGo(0);
+}
+
+function coachEnd(){
+  if(!coachOn) return;
+  const finished=coachIdx>=COACH_STEPS.length-1;
+  coachOn=false;
+  coachIdx=-1;
+  stopCoachAudio();
+  document.getElementById('coach').hidden=true;
+  showView('record');
+  window.scrollTo(0,0);
+  if(finished) SFX.done(); else SFX.off();
+  try{ localStorage.setItem(COACH_KEY,'1'); }catch(e){}
+}
+
+function bindCoach(){
+  document.getElementById('coachNext').addEventListener('click',function(){
+    if(coachIdx>=COACH_STEPS.length-1) coachEnd();
+    else coachGo(coachIdx+1);
+  });
+  document.getElementById('coachPrev').addEventListener('click',function(){
+    if(coachIdx>0) coachGo(coachIdx-1);
+  });
+  document.getElementById('coachSkip').addEventListener('click',coachEnd);
+  document.getElementById('btnGuide').addEventListener('click',coachStart);
+  document.getElementById('coachMute').addEventListener('click',function(){
+    soundOn=!soundOn;
+    try{ localStorage.setItem('liuhen-sound',soundOn?'1':'0'); }catch(e){}
+    syncMute();
+    if(soundOn) SFX.done();
+  });
+  document.getElementById('coach').addEventListener('click',function(e){
+    if(e.target===this) coachEnd();
+  });
+  document.addEventListener('keydown',function(e){
+    if(coachOn&&e.key==='Escape') coachEnd();
+  });
+}
+
+/* ---------- 启动 ---------- */
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+initRecord(); bindReview(); bindExport(); bindCoach();
+updateTypeUI(); updateUseUI(); updateSaveBtn();
+renderTrash();
+showView('record');
+try{
+  if(!sessionStorage.getItem('liuhen-entered')){
+    document.body.classList.add('entering');
+    sessionStorage.setItem('liuhen-entered','1');
+    setTimeout(function(){ document.body.classList.remove('entering'); },800);
+  }
+}catch(e){}
+
+/* 第一次打开自动走一遍引导；看过的人不再打扰 */
+try{
+  if(!localStorage.getItem(COACH_KEY)) setTimeout(coachStart,500);
+}catch(e){}
+
+
+})();
+
+</script>
+</body>
+</html>
