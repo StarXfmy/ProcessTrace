@@ -1254,7 +1254,6 @@ header.top{flex:0 0 auto}
           <div class="actions">
             <button class="btn primary" type="button" id="btnCopy">复制全文</button>
             <button class="btn" type="button" id="btnDoc">导出 Word（.doc）</button>
-            <button class="btn" type="button" id="btnDemo">载入示例记录</button>
             <span class="hint" id="expHint"></span>
           </div>
           <p class="hint" style="margin-top:10px">「导出 Word」是把左边预览原样装进 .doc，一个字不加、不改排版逻辑；Word 打开后可再套你们自己的封面。</p>
@@ -1290,63 +1289,6 @@ header.top{flex:0 0 auto}
 
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script>
-/* seed.js */
-/* 示例记录：内容取自 2026-10-19 一次真实的选题讨论，用于演示流程。
-   demo 标记会在界面上显示【示例】，避免被当成真实交付数据。
-   注意：时刻为示意，只有日期是准的——真实时间戳要由产品当场自动打，不能事后补。 */
-window.SEED = [
-  {
-    id:'R001', ts:'2026-10-19 21:40', tool:'Qoder CN',
-    scene:'给 AIGC 大赛选赛道',
-    myWords:'这是学校的课程要求参加的比赛，用于期末考试，你觉得我适合选哪一个赛道，又有什么建议',
-    aiResult:'读了桌面上的通知 docx，结论选赛题一，理由是预赛权重 PPT 37.5% + 文档 25% + 视频 25% + AI 使用规范 12.5%，纸面表达比代码量值钱。',
-    later:'我一开始以为要挑技术最强的那条，看到权重表才发现讲清楚比做复杂值钱。',
-    verdict:'agree', slot:'关键 Prompt', demo:true
-  },
-  {
-    id:'R002', ts:'2026-10-19 22:05', tool:'Qoder CN',
-    scene:'从个人小站引申能做什么',
-    myWords:'从我的个人小站引申出来我可以做什么',
-    aiResult:'查了线上站点状态和本地项目代码，发现后端已有按 user_id 隔离的存储、通知已读回执、.ics 课表导入，于是推荐做社团通知回执台。',
-    later:'',
-    verdict:null, slot:'生成或开发过程', demo:true
-  },
-  {
-    id:'R003', ts:'2026-10-19 22:20', tool:'Qoder CN',
-    scene:'否掉社团方向',
-    myWords:'可是我目前对电赛社团还不熟悉啊',
-    aiResult:'撤回社团台账和实验数据两个方向，改判据为"只选我今天就在经历、数据正在自动产生的题"，落到过程留痕。',
-    later:'它假设我能组织社团，这个前提我一个月前就没建立起来。',
-    verdict:'agree', slot:'人工核查', demo:true
-  },
-  {
-    id:'R004', ts:'2026-10-19 23:10', tool:'Qoder CN',
-    scene:'追问 AI 辅助与代写的界线',
-    myWords:'但是防不住用户自己用AI填写啊',
-    aiResult:'承认防不住，放弃做 AI 文风检测，改成把原始记录并排显示，让编造的成本变高、核查的成本变零。',
-    later:'',
-    verdict:'agree', slot:'迭代优化', demo:true
-  },
-  {
-    id:'R005', ts:'2026-10-19 23:32', tool:'Qoder CN',
-    scene:'质疑产品应用性',
-    myWords:'评比是在比赛结束时，那这个项目的应用性就不是很高了',
-    aiResult:'承认需求锚点钉错，从"比赛要求"改钉到课程规范那句"完成学术任务时必须声明"，并把输出层改成可切换模板。',
-    later:'这个是我自己想到的，它之前一直在讲比赛。',
-    verdict:'agree', slot:'人工核查', demo:true
-  },
-  {
-    id:'R006', ts:'2026-10-19 22:30', tool:'Qoder CN',
-    scene:'定队友分工表',
-    myWords:'碰代码是什么意思，是指和AI聊天吗，我也不算碰代码吧',
-    aiResult:'承认用错了分工尺子，改按定规矩 / 提要求 / 验收 / 表达四类角色切，再按四人合并成四格。',
-    later:'',
-    verdict:null, slot:'迭代优化', demo:true
-  }
-];
-
-</script>
 <script>
 /* parse.js */
 /* 把"我的指令 / AI 的回复"两段文字切成若干轮，并给每轮挑一句重点。
@@ -2655,13 +2597,6 @@ function bindExport(){
   const ff=document.getElementById('fFull');
   ff.checked=includeFull;
   ff.addEventListener('change',()=>{ includeFull=ff.checked; renderExport(); });
-  document.getElementById('btnDemo').addEventListener('click',()=>{
-    let added=0;
-    window.SEED.forEach(s=>{ if(!findRec(s.id)){ const c=JSON.parse(JSON.stringify(s)); c.owner=me; db.push(c); added++; } });
-    db.sort((x,y)=>x.ts<y.ts?1:-1);
-    save(); renderExport();
-    toast(added?('载入 '+added+' 条示例记录'+(me?('，都记在 '+me+' 名下'):'，你还没填名字')):'示例已经在了');
-  });
   document.getElementById('btnFixSign').addEventListener('click',()=>{
     showView('record');
     const mi=document.getElementById('fMe');
