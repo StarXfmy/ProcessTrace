@@ -423,22 +423,24 @@ body.entering .view.on{animation:fadeUp .3s ease both}
   box-shadow:0 24px 60px rgba(0,0,0,.3);
   animation:coachIn .22s ease both;
 }
-.coachmute{
-  position:absolute;top:8px;right:10px;z-index:4;
-  border:0;background:transparent;color:var(--ink3);cursor:pointer;
-  padding:5px;line-height:0;border-radius:4px;opacity:.65;
+.coachclose{
+  position:absolute;top:6px;right:8px;z-index:4;
+  width:36px;height:36px;border:0;background:transparent;color:var(--ink3);
+  font:inherit;font-size:24px;line-height:1;cursor:pointer;border-radius:6px;
 }
-.coachmute:hover{opacity:1;background:rgba(0,0,0,.04)}
-.coachmute .slash{display:none}
-.coachmute.off .slash{display:block}
-.coachmute.off{opacity:.45}
+.coachclose:hover{background:rgba(0,0,0,.06);color:var(--ink)}
+.coachclose.armed{background:var(--badbg);color:var(--bad)}
+.coachtip{
+  margin:0 0 10px;padding:8px 10px;border:1px solid #e2d3a8;background:var(--warnbg);
+  color:var(--warn);border-radius:6px;font-size:13px;line-height:1.65;
+}
+.coachtip b{color:var(--bad)}
 @keyframes coachIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
 .coachstep{font-size:12px;color:var(--brand);font-weight:700;letter-spacing:.6px;margin-bottom:4px}
 .coachcard h3{font-size:21px;margin:0 0 6px;line-height:1.4;font-weight:700;color:var(--ink)}
 .coachcard p{margin:0 0 16px;font-size:15px;color:var(--ink2);line-height:1.8}
 .coachcard p b{color:var(--ink)}
 .coachops{display:flex;align-items:center;gap:8px}
-#coachSkip{margin-right:auto}
 .coachops .btn{font-size:14px;padding:8px 16px}
 
 /* 图区：每步一段小动画 */
@@ -518,7 +520,10 @@ body.entering .view.on{animation:fadeUp .3s ease both}
 
 /* 7 导出 */
 .f-doc.big{width:72px;height:74px;animation:figIn .5s both}
-.f-file{
+.f-thumb{position:relative;width:44px;height:32px;border:1px solid var(--line2);border-radius:3px;background:#fff;box-shadow:inset 0 1px 0 #fff;animation:figIn .4s both}
+.f-thumb::before,.f-thumb::after{content:'';position:absolute;left:7px;height:3px;border-radius:2px;background:var(--line)}
+.f-thumb::before{top:8px;right:7px}
+.f-thumb::after{top:16px;right:14px}.f-file{
   font-size:12px;color:var(--ink2);background:#fff;border:1px solid var(--line2);
   border-radius:3px;padding:4px 12px;animation:fFileIn 2.9s ease infinite;
 }
@@ -1046,7 +1051,6 @@ header.top{flex:0 0 auto}
   .coachfig{height:clamp(150px,30vh,210px)}
   .coachcard h3{font-size:19px}
   .coachcard p{font-size:14px;line-height:1.75;margin-bottom:14px}
-  #coachSkip{margin-right:0}
   .coachops{gap:8px}
   .coachops .btn{flex:1;min-height:42px;padding:8px 10px}
 
@@ -1267,20 +1271,14 @@ header.top{flex:0 0 auto}
 <!-- 新手引导：全屏压暗 + 屏幕正中的教程卡（每步一段小动画） -->
 <div class="coach" id="coach" hidden>
   <div class="coachcard" id="coachCard">
-    <button class="coachmute" id="coachMute" type="button" aria-label="开关声音" title="开关声音">
-      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
-        <path d="M4 9h3.5L12 5.2v13.6L7.5 15H4z" fill="currentColor"/>
-        <path d="M15.5 9a4 4 0 0 1 0 6M18 6.6a7.5 7.5 0 0 1 0 10.8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-        <path class="slash" d="M4.5 19.5 L19.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <button class="coachclose" id="coachClose" type="button" aria-label="关闭引导" title="关闭引导">×</button>
     <div class="coachfig" id="coachFig"></div>
     <div class="coachstep" id="coachStep"></div>
     <div class="coachdots" id="coachDots"></div>
     <h3 id="coachTitle"></h3>
     <p id="coachText"></p>
+    <div class="coachtip" id="coachTip" hidden>有问题随时点右上角「▶ 新手引导」重看，也可以打开「帮助文档」。<b>再点一次 × 关闭。</b></div>
     <div class="coachops">
-      <button class="btn tiny" type="button" id="coachSkip">跳过</button>
       <button class="btn tiny" type="button" id="coachPrev">上一步</button>
       <button class="btn primary tiny" type="button" id="coachNext">下一步</button>
     </div>
@@ -2853,12 +2851,10 @@ function toast(msg){
   clearTimeout(timer); timer=setTimeout(()=>el.hidden=true,2600);
 }
 
-/* ---------- 引导音效：Web Audio 现场合成，不引外部音频文件 ---------- */
-let actx=null, soundOn=true;
-try{ soundOn=localStorage.getItem('liuhen-sound')!=='0'; }catch(e){}
+/* ---------- 引导音效：Web Audio 现场合成，不引外部音频文件；默认一直开 ---------- */
+let actx=null;
 
 function audioCtx(){
-  if(!soundOn) return null;
   try{
     if(!actx){
       const C=window.AudioContext||window.webkitAudioContext;
@@ -2913,11 +2909,6 @@ const SFX={
   ding:function(){ tone(880,0.12,0.04,0); tone(1175,0.16,0.035,0.09); }
 };
 
-function syncMute(){
-  const b=document.getElementById('coachMute');
-  if(b) b.classList.toggle('off',!soundOn);
-}
-
 /* 按动画节奏排音效：周期 2.9s 与 CSS 动画一致，播两轮就停 */
 let coachAudioTimer=null, coachAudioQueue=[];
 function stopCoachAudio(){
@@ -2927,7 +2918,7 @@ function stopCoachAudio(){
 function coachAudioFor(i){
   stopCoachAudio();
   const kind=COACH_SFX[i];
-  if(!kind||!soundOn||!coachOn) return;
+  if(!kind||!coachOn) return;
   const CYCLE=2900;
   let rounds=0;
   function que(d,fn){ coachAudioQueue.push(setTimeout(fn,d)); }
@@ -2965,23 +2956,32 @@ function figHit(cls,inner){
 }
 const COACH_STEPS=[
   {title:'这是你的 AI 使用账本',
-   text:'用一次 AI 就记一条。交材料时，工具把存下来的原话排成能交给老师的附录。<b>不联网，记录只留在这台电脑的浏览器里。</b>',
+   text:'用一次 AI 就记一条。交材料时，工具把存下来的原话排成能交给老师的附录。<b>不联网，记录只留在这台电脑的浏览器里。</b>左边填一条，右边是已保存的记录；顶部两个页签在「记录」和「导出」之间换。',
    next:'开始看',
    fig:'<div class="figrow"><div class="f-stack"><i></i><i></i><i></i></div><div class="f-arrow">→</div><div class="f-doc"><b></b><b></b><b></b><b></b></div></div>'},
-  {title:'填你的名字（必填）',
-   text:'每条记录都会带着这个名字，几个人各自记、最后合并时靠它分人。<b>名字不填，「保存这一条」不会亮。</b>',
+  {title:'先填你的名字',
+   text:'顶部这个框填一次就行，每条记录都会带着它。<b>几个人各自记、最后合并时靠名字分人；名字不填，「保存这一条」不会亮。</b>换个浏览器或换台电脑，要重新填。',
    fig:'<div class="figcol"><div class="f-field"><span class="f-cap">你的名字</span>'+figHit('f-in','<span class="f-type" style="--w:2.1em;animation-delay:1.5s">张三</span><i class="f-caret"></i>')+'</div></div>'},
-  {title:'选类型，把内容填进去',
-   text:'先选 <b>AI / 资料 / 原创</b>；用的工具和归类也在这里自己选。AI 要把<b>「我问的话」和「AI 回的话」都贴上</b>，资料填名称和来源，原创写做了什么。',
+  {title:'选这次记的是什么',
+   text:'<b>AI</b> = 问过 AI；<b>资料</b> = 查过的网页、书、别人给的；<b>原创</b> = 自己画的图、剪的片子、写的段落。点哪个，下面就换成对应的框，不用填别的类型。',
    fig:'<div class="figcol"><div class="f-types cycle"><span class="on">AI</span><span>资料</span><span>原创</span></div><div class="f-fields"><div class="f-fg fg-a"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">DeepSeek</span></div><div class="f-in tiny"><span class="f-drop">归类：迭代优化</span></div></div><div class="f-row"><span class="f-tag">我问</span><div class="f-in tall"><span class="f-drop" style="--d:.2s">帮我把首页的锁屏页改成盖在首页上…</span></div></div><div class="f-row"><span class="f-tag">它回</span><div class="f-in tall"><span class="f-drop" style="--d:.6s">给你覆盖层结构，注意 z-index 要压过导航…</span></div></div></div><div class="f-fg fg-r"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">豆包</span></div><div class="f-in tiny faint"><span class="f-drop">资料不用归类</span></div></div><div class="f-row"><span class="f-tag">名称</span><div class="f-in tall"><span class="f-drop">归并排序 · 维基百科</span></div></div><div class="f-row"><span class="f-tag">来源</span><div class="f-in tall"><span class="f-drop">en.wikipedia.org 稳定排序一节</span></div></div></div><div class="f-fg fg-o"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">Figma</span></div><div class="f-in tiny faint"><span class="f-drop">原创不用归类</span></div></div><div class="f-row"><span class="f-tag">做了什么</span><div class="f-in tall"><span class="f-drop">自己画了系统流程图</span></div></div><div class="f-row"><span class="f-tag">工具</span><div class="f-in tall"><span class="f-drop">Figma</span></div></div></div></div></div>'},
-  {title:'选采纳、写处理，再保存',
-   text:'<b>只有 AI 记录有这一步</b>：直接采用不用写；改了一点写<b>怎么改的</b>；未采纳写<b>为什么没用</b>。必填项全齐，旁边的「保存这一条」才会亮起来。资料和原创填完内容直接保存。',
-   fig:'<div class="figcol"><div class="f-types cycle"><span>直接采用</span><span class="on">改了一点</span><span>未采纳</span></div><div class="f-in later"><span class="f-type s8" style="--w:8.2em">太生硬，改成淡入</span><i class="f-caret"></i></div>'+figHit('f-btn','保存这一条')+'</div>'},
-  {title:'点开一条看详情，再点一下收起',
-   text:'左边是已保存的记录，只显示时间、类型、工具和一句话标题。<b>点哪条，右边滑出它的完整内容；再点一下收起。</b>归类在卡片头部就能改。',
-   fig:'<div class="figcol"><div class="f-split"><div class="f-minis cycle"><i></i><i class="on"></i><i></i></div><div class="f-panel"><b></b><b></b><b></b><b></b></div></div><div class="f-cap" style="text-align:center">点左边一条 → 右边看详情</div></div>'},
-  {title:'在「导出」页出附录',
-   text:'先填「本人负责哪部分」，再到<b>「最后确认」</b>勾上「本人承诺」——左边末尾才会出现诚信声明。然后复制全文或导出 Word；几个人各导出记录，再由一个人导入合并。',
+  {title:'选用的工具和归类',
+   text:'「用的工具」默认是「请选择使用工具」，必须自己选；列表里没有就选「其他」，旁边会出输入框自己填。<b>归类只有 AI 记录要选</b>（关键 Prompt / 生成或开发过程 / 迭代优化 / 测试验证 / 人工核查），你自己判断，工具不替你归类。',
+   fig:'<div class="figcol"><div class="f-row"><span class="f-tag">工具</span><div class="f-in tiny"><span class="f-drop">DeepSeek</span></div></div><div class="f-row"><span class="f-tag">归类</span>'+figHit('f-in tiny','<span class="f-drop">迭代优化</span>')+'</div></div>'},
+  {title:'把对话原样贴进来',
+   text:'AI 记录贴两个框：<b>「我问 AI 的话」</b>和<b>「AI 回我的话」</b>，原样贴、别改字。回复里带不带空行都行，<b>一次使用就是一条</b>，工具不会给你拆成好几条。资料记录填名称和来源；原创写一句你做了什么。',
+   fig:'<div class="figcol"><div class="f-row"><span class="f-tag">我问</span><div class="f-in tall"><span class="f-drop" style="--d:.2s">帮我把首页的锁屏页改成盖在首页上…</span></div></div><div class="f-row"><span class="f-tag">它回</span><div class="f-in tall"><span class="f-drop" style="--d:.6s">给你覆盖层结构，注意 z-index 要压过导航…</span></div></div></div>'},
+  {title:'选采纳，写一句你怎么处理的',
+   text:'<b>只有 AI 记录有这一步</b>：直接采用，不用再写；改了一点，写一句<b>怎么改的</b>；未采纳，写一句<b>为什么没用</b>。这一栏只能你自己写，工具不代填——它正是以后能说清「我想过什么」的证据。',
+   fig:'<div class="figcol"><div class="f-types cycle"><span>直接采用</span><span class="on">改了一点</span><span>未采纳</span></div><div class="f-in later"><span class="f-type s8" style="--w:8.2em">太生硬，改成淡入</span><i class="f-caret"></i></div></div>'},
+  {title:'要配图就加，然后保存',
+   text:'需要证据就点「<b>加截图</b>」，一次最多 6 张，每张能单独写图注、单独删；也可以贴原始对话链接。<b>必填没齐时「保存这一条」是灰的</b>，旁边写还差什么；存完表单回到默认，可以接着记下一条。',
+   fig:'<div class="figcol"><div class="f-row"><div class="f-in tiny"><span class="f-drop">加截图</span></div><div class="f-thumb"></div><div class="f-thumb"></div></div>'+figHit('f-btn','保存这一条')+'</div>'},
+  {title:'点开一条看详情',
+   text:'右边是已保存的记录，只显示时间、类型、工具、归类和一句话标题。<b>点一条，详情就展开</b>（电脑上在右栏，手机上接在卡片下面）；再点一下或点「收起」合上。归类在卡片头部就能改。删错了进「回收站」，能恢复。',
+   fig:'<div class="figcol"><div class="f-split"><div class="f-minis cycle"><i></i><i class="on"></i><i></i></div><div class="f-panel"><b></b><b></b><b></b><b></b></div></div><div class="f-cap" style="text-align:center">点一条 → 看详情</div></div>'},
+  {title:'到「导出」页出附录',
+   text:'先填「<b>本人负责哪部分</b>」，再勾「<b>本人承诺</b>」，预览末尾才会出现诚信声明；然后复制全文或导出 Word。<b>几个人各导出自己的记录</b>，由一个人导入合并，重复导入不会多出一遍。',
    next:'开始记第一条',
    fig:'<div class="figcol">'+figHit('f-btn','导出 Word')+'<div class="f-doc big"><b></b><b></b><b></b><b></b></div><div class="f-file">AI 使用说明.doc</div></div>'}
 ];
@@ -2989,7 +2989,7 @@ const COACH_STEPS=[
 let coachIdx=-1, coachOn=false;
 
 /* 每一步配什么音效：null=没有可点的动作 */
-const COACH_SFX=[null,'type',null,'typeclick','clickding','clickfile'];
+const COACH_SFX=[null,'type','typeclick','click','type','click','clickding','clickding','clickfile'];
 
 function coachGo(i){
   if(!coachOn) return;
@@ -3009,17 +3009,34 @@ function coachGo(i){
   prev.disabled=(i===0);
   prev.style.display=(i===0?'none':'');
   document.getElementById('coachNext').textContent=st.next||(i===COACH_STEPS.length-1?'开始记第一条':'下一步');
-  document.getElementById('coachSkip').textContent=(i===0?'先跳过':'跳过');
   coachAudioFor(i);
+}
+
+let coachCloseArmed=false;
+
+function coachAskClose(){
+  if(!coachOn) return;
+  if(!coachCloseArmed){
+    coachCloseArmed=true;
+    const tip=document.getElementById('coachTip');
+    if(tip) tip.hidden=false;
+    const b=document.getElementById('coachClose');
+    if(b) b.classList.add('armed');
+    SFX.step();
+    return;
+  }
+  coachEnd();
 }
 
 function coachStart(){
   if(coachOn) return;
   coachOn=true;
+  coachCloseArmed=false;
   const layer=document.getElementById('coach');
   if(!layer) return;
   layer.hidden=false;
-  syncMute();
+  const tip=document.getElementById('coachTip'); if(tip) tip.hidden=true;
+  const cb=document.getElementById('coachClose'); if(cb) cb.classList.remove('armed');
   SFX.open();
   coachGo(0);
 }
@@ -3045,19 +3062,13 @@ function bindCoach(){
   document.getElementById('coachPrev').addEventListener('click',function(){
     if(coachIdx>0) coachGo(coachIdx-1);
   });
-  document.getElementById('coachSkip').addEventListener('click',coachEnd);
   document.getElementById('btnGuide').addEventListener('click',coachStart);
-  document.getElementById('coachMute').addEventListener('click',function(){
-    soundOn=!soundOn;
-    try{ localStorage.setItem('liuhen-sound',soundOn?'1':'0'); }catch(e){}
-    syncMute();
-    if(soundOn) SFX.done();
-  });
+  document.getElementById('coachClose').addEventListener('click',coachAskClose);
   document.getElementById('coach').addEventListener('click',function(e){
-    if(e.target===this) coachEnd();
+    if(e.target===this) coachAskClose();
   });
   document.addEventListener('keydown',function(e){
-    if(coachOn&&e.key==='Escape') coachEnd();
+    if(coachOn&&e.key==='Escape') coachAskClose();
   });
 }
 
