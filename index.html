@@ -960,6 +960,112 @@ header.top{flex:0 0 auto}
 .q.mine{border-left-color:var(--line)}
 .q.miss{border-left:1px solid var(--line);border-color:var(--line)}
 
+/* v56：v32 的 4:6 写在窄屏规则之后，会盖掉单列——这里补回 */
+@media (max-width:1150px){
+  .recordgrid{grid-template-columns:1fr}
+  .colform{max-width:760px;margin-left:auto;margin-right:auto;width:100%}
+}
+
+.detailclose{display:none}
+
+/* ===== v56：手机竖屏适配（≤720px；桌面布局完全不变） ===== */
+@media (max-width:720px){
+  /* 顶栏：品牌与页签一行，辅助入口第二行 */
+  .top{padding:calc(8px + env(safe-area-inset-top)) 12px 0}
+  .toprow{gap:6px 14px}
+  .brand{font-size:19px}
+  .tabs{gap:16px;margin-top:0}
+  .tab{font-size:15px;min-height:40px;padding:8px 0 9px}
+  .tab i{width:19px;height:19px;font-size:11px;margin-right:5px}
+  .toplinks{gap:6px;margin-top:0}
+  .toplinks .bubble{font-size:12px;min-height:34px;padding:6px 10px}
+
+  /* 页面骨架 */
+  #page{padding:12px 12px 0}
+  .card.form{padding:14px}
+  .reviewbox{padding:12px}
+  .lead{font-size:14px;line-height:1.7;margin-bottom:12px}
+  .field,#recForm .field{margin-bottom:14px}
+  .field>span{font-size:14px}
+  .field>span small{display:block;margin:2px 0 0;font-size:12px}
+
+  /* iOS 输入框小于 16px 会自动放大整页 */
+  input,select,textarea{font-size:16px;padding:10px 12px;min-width:0}
+  textarea{min-height:68px}
+  .row.two{grid-template-columns:1fr;gap:0}
+  .types{gap:8px}
+  .typeslabel{flex:1 1 100%;margin-bottom:2px}
+  .type{min-height:40px;padding:8px 18px}
+  .imgitem .imgnote{font-size:16px}
+
+  /* 触控目标放大 */
+  .btn{min-height:42px;padding:10px 16px}
+  .btn.tiny{min-height:34px;padding:6px 12px}
+  .vbtn{min-height:38px;padding:7px 12px}
+  .meter span{padding:6px 12px;font-size:13px}
+  .usebox{gap:8px}
+  .usebox .vbtn{flex:1 1 30%;font-size:14px}
+
+  /* 保存条：按钮整行，提示在下面 */
+  .savebar{gap:6px;padding:10px 0}
+  .savebar .btn.primary{width:100%;min-height:48px;font-size:16px}
+  .savebar .hint{width:100%;text-align:center}
+
+  /* 列表与详情 */
+  .reviewhead h2{font-size:17px}
+  .rcb{padding:10px}
+  .rcb .rctitle{font-size:15px}
+  .rcb .rchead{font-size:11px;gap:6px}
+  .rcb .slotmini{font-size:16px;padding:2px 5px;max-width:45vw}
+  .detailinner{padding:14px}
+  .detailhead .vbtn{margin-left:0}
+  .detailclose{display:inline-block}
+  .carddetail{scroll-margin-top:104px}
+  .savelist.open .carddetail{max-height:20000px}
+
+  /* 导出页：上下排列；先填「本人负责」，再看预览 */
+  .exportgrid{gap:12px}
+  .exportright{order:-1}
+  .merge{padding:12px}
+  .merge>span{display:none}
+  .merge>b{font-size:13px;margin-bottom:8px}
+  .merge .actions{gap:8px}
+  .merge .actions .btn{flex:1 1 auto;min-width:0;padding:8px 10px;font-size:13px;min-height:40px}
+  .exportleft .paper{max-height:none;overflow:visible;padding:16px}
+  .paper h2{font-size:20px}
+  .sign{padding:14px}
+  .declarebox{padding:12px}
+  .declarebox .opt{font-size:14px}
+  .declarebox .opt input{width:20px;height:20px;margin-top:2px}
+  .exportright .actions .btn{flex:1 1 100%}
+  .signrow{flex-wrap:wrap}
+
+  /* 新手引导：卡片铺满宽度，三个按钮均分 */
+  .coach{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .coachcard{width:100%;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);padding:16px 14px 14px}
+  .coachfig{height:clamp(150px,30vh,210px)}
+  .coachcard h3{font-size:19px}
+  .coachcard p{font-size:14px;line-height:1.75;margin-bottom:14px}
+  #coachSkip{margin-right:0}
+  .coachops{gap:8px}
+  .coachops .btn{flex:1;min-height:42px;padding:8px 10px}
+
+  /* 长内容不撑破屏幕 */
+  .paper,.q,.quote,.detailinner,.importbox,.merge,.rcb{overflow-wrap:anywhere}
+  img,svg,video{max-width:100%}
+
+  body{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
+
+@media (max-width:430px){
+  .brand{font-size:18px}
+  .tabs{gap:14px}
+  .toplinks .bubble{font-size:11px;padding:5px 9px}
+  .type{padding:8px 14px}
+  .paper{padding:14px}
+  .paper h2{font-size:19px}
+}
+
 </style>
 </head>
 <body>
@@ -984,7 +1090,7 @@ header.top{flex:0 0 auto}
   <section class="view on" id="v-record">
     <div class="recordgrid">
       <div class="colform">
-        <p class="lead">用一次记一条：先选类型，填完点「保存这一条」。右边点一条看详情、选归类。</p>
+        <p class="lead">用一次记一条：先选类型，填完点「保存这一条」。点开一条看详情、选归类。</p>
 
         <form class="card form glass" id="recForm" autocomplete="off">
       <label class="field">
@@ -1110,7 +1216,7 @@ header.top{flex:0 0 auto}
 
   <!-- 视图二：出附录 -->
   <section class="view" id="v-export">
-    <p class="lead">左边是预览，右边填完「本人负责」就能复制或导出 Word。</p>
+    <p class="lead">填完「本人负责」，就能复制或导出 Word；预览里可以对照检查。</p>
 
     <div class="importbox" id="importBox" hidden></div>
 
@@ -1142,7 +1248,7 @@ header.top{flex:0 0 auto}
             <input type="checkbox" id="fFull"> <span>连原始记录全文一起导出（给附加材料用；Word 正文建议不勾）</span>
           </label>
           <div class="declarebox">
-            <div class="declaretitle">最后确认（勾上后左下方才出现声明）</div>
+            <div class="declaretitle">最后确认（勾上后预览里才出现声明）</div>
             <label class="opt"><input type="checkbox" id="fPromise"> <span>本人承诺：本作品中的 AI 使用情况与素材来源均已如实记录，未隐瞒、未虚构。</span></label>
           </div>
           <div class="actions">
@@ -1901,6 +2007,9 @@ function renderTrash(){
 
 /* ---------- 已保存列表：左边点一条，右边看详情 ---------- */
 function renderList(){
+  const detailEl=document.getElementById('detail');
+  const savelistEl=document.getElementById('savelist');
+  if(detailEl&&savelistEl&&detailEl.parentNode&&detailEl.parentNode.id==='cards') savelistEl.appendChild(detailEl);
   const cnt=document.getElementById('savedCount');
   if(cnt) cnt.textContent=String(db.length);
   const aiN=db.filter(r=>(r.type||'ai')==='ai').length;
@@ -2026,6 +2135,7 @@ function detailHtml(r){
   return '<div class="detailhead">'+
       '<b class="vtag">'+id+'</b>'+
       '<span class="hint">'+(isMulti()?esc(r.owner||'未填名字')+' · ':'')+esc(TYPE_LABEL[t])+'</span>'+
+      '<button class="vbtn detailclose" type="button" data-act="close" data-id="'+id+'">收起</button>'+
       '<button class="vbtn'+(pendingDelId===r.id?' on-disagree':'')+'" type="button" data-act="del" data-id="'+id+'">'+
         (pendingDelId===r.id?'确认删除（再点一次）':'删除这条')+'</button>'+
     '</div>'+
@@ -2047,6 +2157,9 @@ function selectRec(id){
   selectedId=id;
   renderList();
   const d=document.getElementById('detail');
+  const card=document.querySelector('.rcb[data-id="'+id+'"]');
+  const narrow=window.matchMedia&&window.matchMedia('(max-width:720px)').matches;
+  if(narrow&&d&&card) card.insertAdjacentElement('afterend', d);
   if(d&&d.scrollIntoView) d.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -2098,6 +2211,13 @@ function bindReview(){
     const r=findRec(b.dataset.id); if(!r) return;
     const act=b.dataset.act;
 
+    if(act==='close'){
+      selectedId='';
+      renderList();
+      const card=document.querySelector('.rcb[data-id="'+r.id+'"]');
+      if(card&&card.scrollIntoView) card.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
     if(act==='del'){
       if(pendingDelId===r.id){
         clearTimeout(pendingDelTimer);
