@@ -14,6 +14,7 @@ body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.75 -ap
 .content{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 6px var(--s6) 0}
 h1{font-size:23px;margin:0 0 var(--s1)}
 .sub{color:var(--ink3);font-size:13px;margin:0 0 var(--s5)}
+.sub a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
 h2{font-size:17px;margin:var(--s5) 0 var(--s2);padding-bottom:6px;border-bottom:1px solid var(--line)}
 p{margin:0 0 var(--s2)}
 ol,ul{margin:0 0 var(--s3);padding-left:22px}
@@ -59,13 +60,13 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   <div class="head">
 
   <h1>过程留痕 · 帮助文档</h1>
-  <p class="sub">配套本地文件，点开不联网、不占任何访问次数。更新：2026-10-27</p>
+  <p class="sub">最近更新：2026-11-26 · 在线地址：<a href="https://starxfmy.github.io/ProcessTrace/">https://starxfmy.github.io/ProcessTrace/</a></p>
 
   <div class="note">一句话：<b>用一次 AI（或查资料、做原创）就记一条；交材料时在「导出」页生成说明。</b>它不替你写声明——只把你当时说过的话原样留住、按栏目排好。</div>
 
   <div class="toc">
-    <a href="#look">界面总览</a><a href="#start">30 秒上手</a><a href="#types">三种类型</a>
-    <a href="#required">哪些必填</a><a href="#list">列表与详情</a><a href="#export">导出与确认</a>
+    <a href="#look">界面总览</a><a href="#start">30 秒上手</a><a href="#guide">新手引导</a><a href="#types">三种类型</a>
+    <a href="#required">哪些必填</a><a href="#list">列表与详情</a><a href="#trash">回收站</a><a href="#export">导出与确认</a>
     <a href="#team">队友合并</a><a href="#data">数据在哪</a><a href="#why">为什么不改写</a>
   </div>
   </div>
@@ -114,15 +115,23 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   </figure>
 
   <h2 id="start">30 秒上手</h2>
+  <p class="note">第一次打开会自动出现九步新手引导，介绍记录页、导出页和队友合并的位置。点右上角 × 时先提醒一次，再点一次才关闭；之后可随时点顶部「▶ 新手引导」重新打开。</p>
   <ol>
     <li>顶部填<b>你的名字</b><span class="req">必填</span>（合并队友记录时靠它分人）。</li>
     <li>选类型：<b>AI</b> / <b>资料</b> / <b>原创</b>；再选<b>用的工具</b><span class="req">必填</span>和<b>归类</b><span class="req">必填</span>（只有 AI 记录要归类）。</li>
     <li>按类型填内容；AI 的「我问 AI 的话」「AI 回我的话」两项都要填。</li>
     <li>AI 记录选「是否采纳」<span class="req">必填</span>：直接采用不用写；改了一点写怎么改的；未采纳写为什么没用。</li>
-    <li>需要配图就展开「加截图」：最多 6 张，每张可写图注、可单独删。</li>
+    <li>需要证明就展开「加截图或对话链接」：截图最多 6 张，每张可写图注、可单独删；也可以贴原始对话链接，方便以后复查。</li>
     <li>点「保存这一条」。<b>必填没齐按钮是灰的</b>，旁边写明「还差：…」；保存后表单回到默认（AI / 请选择使用工具 / 请选择归类），名字保留。</li>
     <li>保存后在右边点一条，看完整内容、改归类；列表上方可按 AI / 资料 / 原创筛选。</li>
   </ol>
+
+  <h2 id="guide">新手引导</h2>
+  <ul>
+    <li>首次进入且从未看过引导时，会在页面加载后自动打开，共九步。</li>
+    <li>它依次介绍记录页、三种类型、必填项、截图与链接、保存、列表详情、导出和队友合并。</li>
+    <li>右上角 × 第一次点只进入提醒状态，第二次才关闭；顶部「▶ 新手引导」可以随时重新打开。</li>
+  </ul>
 
   <h2 id="types">三种类型各填什么</h2>
   <ul>
@@ -136,7 +145,7 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   <ul>
     <li>你的名字<span class="req">必填</span></li>
     <li>用的工具<span class="req">必填</span>：默认是「请选择使用工具」，要自己选。</li>
-    <li>归类<span class="req">必填</span>：AI 记录自己选归到哪一栏（不再自动猜）。</li>
+    <li>归类<span class="req">必填</span>：AI 记录要自己选归到哪一栏，新建时不会自动猜。只有导入队友 JSON 且原记录缺归类时，工具才会自动补一栏，导入后仍可手动改。</li>
     <li>AI 记录：我问的话、AI 回的话<span class="req">必填</span>、是否采纳<span class="req">必填</span>；选了改了一点/未采纳还要写处理说明。</li>
     <li>资料：名称或链接<span class="req">必填</span>；原创：做了什么<span class="req">必填</span>。</li>
   </ul>
@@ -170,8 +179,17 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   <ul>
     <li>左边列表每条只显示：时间 · 类型 · 工具 · 归类 · 编号 · 一行标题，点开才在右边看全文。</li>
     <li>整个页面固定不滚，左边表单和右边列表各自滚动。</li>
-    <li>AI 记录的归类在卡片头部、工具后面的下拉里改，改完自动存。</li>
-    <li>详情里可以改采纳方式、手动改「如何处理」那句话、删除这条（点两次确认，进回收站可恢复）。</li>
+    <li>AI 记录的归类在卡片头部、工具后面的下拉里改，改完自动存；导入的队友记录也能调整归类。</li>
+    <li>详情里可以改采纳方式、补充「如何处理」那句话；原始对话内容不提供改写入口。</li>
+    <li>删除这条要点两次：第一次只进入确认状态，第二次才移入回收站。</li>
+  </ul>
+
+  <h2 id="trash">回收站</h2>
+  <ul>
+    <li>打开回收站可以恢复误删的记录，恢复后会回到记录列表。</li>
+    <li>「彻底删除」同样要点两次；彻底删除后无法恢复，操作前要看清。</li>
+    <li>回收站最多保留最近 100 条，超出后较早的删除记录会被丢弃；回收站里的内容不计入导出统计。</li>
+    <li>队友导入的记录如果被删除，也按同一套回收站规则处理。</li>
   </ul>
 
   <h2 id="export">导出与确认</h2>
@@ -207,6 +225,7 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   <ul>
     <li>先填「本人负责哪部分」<span class="req">必填</span>，它会写进最后的诚信声明。</li>
     <li>勾选<b>本人承诺</b>后，左边末尾才出现诚信声明；<b>没勾不能复制/导出</b>。</li>
+    <li>复制或导出前还会检查：所有 AI 记录都已选归类，本人记录里选了「改了一点/未采纳」的都已补处理说明。缺哪项，按钮会提示并带你回去补。</li>
     <li>预览分九节：AI 工具使用、关键 Prompt、生成或开发过程、迭代优化、测试验证、人工核查、资料引用、原创内容与制作过程、诚信声明。左边预览和右边填写各自滚动，页面本身不滚。</li>
     <li>点「复制全文」贴进 Word，或「导出 Word（.doc）」；可勾选「连原始记录全文一起导出」。</li>
   </ul>
@@ -214,12 +233,18 @@ figcaption{font-size:12px;color:var(--ink3);margin-top:6px;text-align:center}
   <h2 id="team">队友之间怎么合</h2>
   <ul>
     <li>各自在导出页点「导出我的记录」得到一个 JSON，发给整理人。</li>
-    <li>整理人点「导入队友的记录」，先看到摘要（谁导的、几条、重复跳过几条），确认后才并入；重复导入不会多出一遍。</li>
-    <li>并入的记录带着队友的名字；内容不能替他改。</li>
+    <li>整理人点「导入队友的记录」，先看到文件来源、拟并入条数、重复跳过条数、类型分布和缺处理说明条数，确认后才并入；重复导入不会多出一遍。</li>
+    <li>如果整个文件都和库里重复，页面会提示不用再并一遍，不显示确认并入按钮。</li>
+    <li>并入的记录保留原记录人。整理人可以查看并调整归类，但采纳方式和「如何处理」只能由本人补，其他人在本机不能代写。</li>
   </ul>
 
   <h2 id="data">数据存在哪</h2>
-  <div class="note bad">记录只存在这台电脑的这个浏览器里，<b>换浏览器、清缓存就没了</b>。每晚点一次「导出我的记录」，等于给自己留一份备份。</div>
+  <p>记录保存在当前设备的当前浏览器本地，不上传到服务器，也不会自动同步到手机或其他电脑。首次打开页面需要联网加载；加载完成后，已保存的记录仍只在本机。</p>
+  <div class="note bad">换浏览器、换设备、清理网站数据或缓存后，记录可能丢失。每晚点一次「导出我的记录」，等于给自己留一份 JSON 备份。</div>
+  <ul>
+    <li>浏览器存储空间不足或禁用了本地存储时，保存可能失败，页面不一定能及时提醒；不要把页面里的内容当成唯一副本。</li>
+    <li>回收站最多保留最近 100 条，不参与导出统计；需要留档的内容应及时导出 JSON。</li>
+  </ul>
 
   <h2 id="why">为什么它不改写你的话</h2>
   <p>这段附录要交给老师、算学术声明。如果工具帮你把话“顺一遍”，这份声明本身就成了 AI 写的——而它要声明的恰恰是“AI 用在哪、我改了什么”。所以它只做三件事：按栏目分类、排序、去重。<b>句子生硬就生硬，生硬是诚实的样子。</b></p>
